@@ -1,5 +1,6 @@
 package org.example;
 
+import java.lang.classfile.instruction.SwitchCase;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -21,6 +22,7 @@ public class Ruleta {
      * Método principal: inicia el programa llamando al menú.
      */
     public static void main(String[] args) {
+
         menu();
     }
 
@@ -28,15 +30,22 @@ public class Ruleta {
      * Controla el flujo principal del programa mostrando
      * un menú en consola.
      */
-    public static void menu() {
-        // TODO: Repetir el menú hasta que el usuario elija salir.
+    public static void menu(Scanner in) {
+        mostrarMenu();
+        opcion=leerOpcion(Scanner in);
+        ejecutarOpcion(int opcion, Scanner in );
+
+
     }
 
     /**
      * Muestra en consola las opciones disponibles del menú.
      */
     public static void mostrarMenu() {
-        // TODO: Mostrar las opciones disponibles para el usuario.
+        System.out.println("MENU");
+        System.out.println("1) INICIO DE RONDA ");
+        System.out.println("2) VER ESTADISTICAS ");
+        System.out.println("3) SALIR ");
     }
 
     /**
@@ -46,8 +55,8 @@ public class Ruleta {
      * @return número de opción ingresado.
      */
     public static int leerOpcion(Scanner in) {
-        // TODO: Leer y retornar la opción ingresada.
-        return 0;
+                                                       // TODO: Leer y retornar la opción ingresada.
+        return in.nextInt();
     }
 
     /**
@@ -57,6 +66,20 @@ public class Ruleta {
      * @param in Scanner para entrada por consola.
      */
     public static void ejecutarOpcion(int opcion, Scanner in) {
+        switch (opcion) {
+            case 1:
+                iniciarRonda(in);
+                break;
+            case 2:
+                mostrarEstadisticas();
+
+                break;
+            case 3:
+                break;
+            default:
+                System.out.println("Opcion invalidad, intenta de nuevo");
+        }
+
         // TODO: Ejecutar la acción asociada a la opción.
     }
 
