@@ -12,6 +12,7 @@ public class Ruleta {
     public static boolean[] historialAciertos = new boolean[MAX_HISTORIAL];
     public static int historialSize = 0;
     public static Random rng = new Random();
+    public  static  final int CANTIDAD_NUMEROS= 37;
 
     public static int[] numerosRojos = {
             1, 3, 5, 7, 9, 12, 14, 16, 18,
@@ -30,11 +31,14 @@ public class Ruleta {
      * Controla el flujo principal del programa mostrando
      * un menú en consola.
      */
-    public static void menu(Scanner in) {
-        mostrarMenu();
-        opcion=leerOpcion(Scanner in);
-        ejecutarOpcion(int opcion, Scanner in );
-
+    public static void menu() {
+        Scanner sc=new Scanner(System.in);
+       int opcion= 0;
+        do{
+            mostrarMenu();
+            opcion=leerOpcion(sc);
+            ejecutarOpcion(opcion,sc );
+        }while (opcion!=3);
 
     }
 
@@ -72,9 +76,9 @@ public class Ruleta {
                 break;
             case 2:
                 mostrarEstadisticas();
-
                 break;
             case 3:
+                System.out.printf("ADIOS, VUELVE PRONTO");
                 break;
             default:
                 System.out.println("Opcion invalidad, intenta de nuevo");
@@ -112,9 +116,8 @@ public class Ruleta {
      * @return número de la ruleta.
      */
     public static int girarRuleta() {
-        // TODO: Generar y retornar un número entre 0 y 36.
-        return 0;
-    }
+        return rng.nextInt(CANTIDAD_NUMEROS);
+    }// TODO: Generar y retornar un número entre 0 y 36.
 
     /**
      * Evalúa si la apuesta realizada por el jugador
@@ -136,7 +139,11 @@ public class Ruleta {
      * @return true si es rojo, false en caso contrario.
      */
     public static boolean esRojo(int n) {
-        // TODO: Buscar el número en el arreglo numerosRojos.
+        for (int i =0; i< numerosRojos.length; i++){
+            if (n==numerosRojos[i]){
+                return true;  /*verifica si es rojo con booleana*/
+            }
+        }
         return false;
     }
 
