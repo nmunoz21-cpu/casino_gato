@@ -40,6 +40,7 @@ public class Ruleta {
             ejecutarOpcion(opcion,sc );
         }while (opcion!=3);
 
+
     }
 
     /**
@@ -59,7 +60,7 @@ public class Ruleta {
      * @return número de opción ingresado.
      */
     public static int leerOpcion(Scanner in) {
-                                                       // TODO: Leer y retornar la opción ingresada.
+        // TODO: Leer y retornar la opción ingresada.
         return in.nextInt();
     }
 
@@ -94,6 +95,8 @@ public class Ruleta {
      * @param in Scanner para entrada por consola.
      */
     public static void iniciarRonda(Scanner in) {
+        System.out.println("INGRESE SU APUESTA:");
+        int apuesta=in.nextInt();
         // TODO: Implementar el flujo completo de una ronda.
     }
 
@@ -105,8 +108,9 @@ public class Ruleta {
      * @return el tipo de apuesta elegido.
      */
     public static char leerTipoApuesta(Scanner in) {
-        // TODO: Leer y validar el tipo de apuesta.
-        return ' ';
+        System.out.println("SELECCIONE APUESTA");    // TODO: Leer y validar el tipo de apuesta
+        System.out.println("(ROJO(R)/NEGRO(N)/PAR(P)/IMPAR(I))");
+        return in.next().charAt(0);
     }
 
     /**
@@ -139,7 +143,7 @@ public class Ruleta {
      * @return true si es rojo, false en caso contrario.
      */
     public static boolean esRojo(int n) {
-        for (int i =0; i< numerosRojos.length; i++){
+        for (int i =0; i< numerosRojos.length; i++){                      /*el .lenght cuenta la cantidad de elementos de un arreglo*/
             if (n==numerosRojos[i]){
                 return true;  /*verifica si es rojo con booleana*/
             }
