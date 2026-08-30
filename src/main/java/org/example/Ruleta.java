@@ -1,5 +1,6 @@
 package org.example;
 
+import javax.lang.model.type.NoType;
 import java.lang.classfile.instruction.SwitchCase;
 import java.util.Random;
 import java.util.Scanner;
@@ -97,7 +98,9 @@ public class Ruleta {
     public static void iniciarRonda(Scanner in) {
         System.out.println("INGRESE SU APUESTA:");
         int apuesta=in.nextInt();
-        // TODO: Implementar el flujo completo de una ronda.
+        char tipo=leerTipoApuesta(in);
+        int numero=girarRuleta();
+        boolean acierto=evaluarResultado(numero,tipo);
     }
 
     /**
@@ -132,8 +135,40 @@ public class Ruleta {
      * @return true si acertó, false si perdió.
      */
     public static boolean evaluarResultado(int numero, char tipo) {
-        // TODO: Evaluar el resultado según el tipo de apuesta.
-        return false;
+        switch (tipo){
+            case 'R':
+                if(esRojo(numero)){
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            case 'N':
+                if(! esRojo(numero)){
+                    return true;
+
+                }else {
+                    return false;
+                }
+
+            case 'P':
+                if (numero%2==0){
+                    return true;
+            }else {
+                    return false;
+                }
+            case 'I':
+                if (numero%2 !=0){
+                    return true;
+
+                }else{
+                    return false;
+                }
+            default:
+                System.out.println("LETRA INCORRECTA VUELVE A INTENTAR ");
+                return false;
+        }
+
     }
 
     /**
