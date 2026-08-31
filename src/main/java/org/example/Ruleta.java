@@ -56,7 +56,13 @@ public class Ruleta {
      * @return número de opción ingresado.
      */
     public static int leerOpcion(Scanner in) {
+        while (!in.hasNextInt()) {
+            System.out.println("NO ES UN NUMERO, VUELVE A INTENTAR");
+            in.next();
+        }
         return in.nextInt();
+
+
     }
 
     /**
@@ -89,12 +95,17 @@ public class Ruleta {
      */
     public static void iniciarRonda(Scanner in) {
         System.out.println("INGRESE SU APUESTA:");
+        while (!in.hasNextInt()) {
+            System.out.println("NO ES UN NUMERO, VUELVE A INTENTAR");
+            in.next();
+        }
         int monto = in.nextInt();
         char tipo = leerTipoApuesta(in);
         int numero = girarRuleta();
         boolean acierto = evaluarResultado(numero, tipo);
         mostrarResultado(numero, tipo, monto, acierto);
         registrarResultado(numero, monto, acierto);
+
     }
 
     /**
