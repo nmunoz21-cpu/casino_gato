@@ -1,5 +1,9 @@
 import javax.swing.*;
-import java.util
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+
 public class VentanaLogin {
     // --- Lista dinámica de usuarios ---
     public static final List USUARIOS = new ArrayList<>();
@@ -10,13 +14,38 @@ public class VentanaLogin {
     private final JLabel lblClave = new JLabel("Clave:");
     private final JPasswordField txtClave = new JPasswordField();
     private final JButton btnIngresar = new JButton("Ingresar");
+    private final JButton btnRegistrar = new JButton("Registrarse");
     /**
      * Constructor que inicializa la ventana de inicio de sesión.
      * Configura sus componentes y eventos.
      */
+
+
     public VentanaLogin() {
-// TODO: Agregar los usuarios iniciales a la lista
-// TODO: Inicializar y configurar la ventana
+        if (USUARIOS.isEmpty()) {
+            USUARIOS.add(new Usuario("Nure", "1234", "Nureddin"));
+            USUARIOS.add(new Usuario("admin", "1234", "Administrador"));
+        }
+        // Configuración del tamaño y layout de la ventana
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(350, 200);
+
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        // Agregar componentes al panel
+        panel.add(lblUsuario);
+        panel.add(txtUsuario);
+        panel.add(lblClave);
+        panel.add(txtClave);
+        panel.add(btnIngresar);
+        panel.add(btnRegistrar);
+
+        frame.add(panel);
+
+        // Eventos de botones
+        btnIngresar.addActionListener(e -> login());
+        btnRegistrar.addActionListener(e -> abrirRegistro());
     }
     /**
      * Muestra la ventana en pantalla.
