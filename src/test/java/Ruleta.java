@@ -130,45 +130,32 @@ public class Ruleta {
     }
 
     /**
-     * Evalúa si la apuesta realizada por el jugador
-     * fue acertada.
+     * Evalúa si la apuesta realizada por el jugador fue acertada.
      *
      * @param numero número obtenido en la ruleta.
      * @param tipo tipo de apuesta elegida.
      * @return true si acertó, false si perdió.
      */
     public static boolean evaluarResultado(int numero, char tipo) {
+
+        if (numero == 0) {
+            return false;
+        }
+
         switch (tipo) {
             case 'R':
-                if (esRojo(numero)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return esRojo(numero);
             case 'N':
-                if (!esRojo(numero)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return !esRojo(numero); // Si no es rojo y no es 0, obligatoriamente es negro
             case 'P':
-                if (numero % 2 == 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return numero % 2 == 0;
             case 'I':
-                if (numero % 2 != 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return numero % 2 != 0;
             default:
                 System.out.println("LETRA INCORRECTA VUELVE A INTENTAR ");
                 return false;
         }
     }
-
     /**
      * Determina si un número corresponde a color rojo.
      *
@@ -247,6 +234,6 @@ public class Ruleta {
                 gananciaNeta -= historialApuestas[i];
             }
         }
-        System.out.println("GANACIA:" + gananciaNeta);
+        System.out.println("GANANCIA:" + gananciaNeta);
     }
 }
