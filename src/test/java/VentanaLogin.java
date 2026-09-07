@@ -6,7 +6,7 @@ import java.util.List;
 
 public class VentanaLogin {
     // --- Lista dinámica de usuarios ---
-    public static final List USUARIOS = new ArrayList<>();
+    public static final List <Usuario> USUARIOS = new ArrayList<>();
     // --- Componentes de la interfaz gráfica ---
     private final JFrame frame = new JFrame("Login - Casino Black Cat");
     private final JLabel lblUsuario = new JLabel("Usuario:");
@@ -52,6 +52,8 @@ public class VentanaLogin {
      * Debe centrarla y hacerla visible.
      */
     public void mostrarVentana() {
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
 // TODO: Centrar y mostrar la ventana
     }
     /**
@@ -71,7 +73,11 @@ public class VentanaLogin {
     si no existe una coincidencia
      */
     private String validarCredenciales(String u, String p) {
-// TODO: Recorrer la lista y validar las credenciales
+        for( Usuario usuario: USUARIOS){
+            if (usuario.validarCredenciales(u,p)){
+                return usuario.getNombre();
+            }
+        }
         return "";
     }
     /**
