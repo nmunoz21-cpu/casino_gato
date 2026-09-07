@@ -45,7 +45,6 @@ public class VentanaRegistro {
         btnVolver.addActionListener(e -> volverLogin());
     }
 
-
     /**
      * Muestra la ventana de registro centrada en pantalla.
      */
@@ -73,7 +72,7 @@ public class VentanaRegistro {
         // Validar que no haya campos vacíos
         if (nombre.isEmpty() || user.isEmpty() || pass.isEmpty()) {
             JOptionPane.showMessageDialog(frame,
-                    "POR FAVOR, COMPLETE TODO LOS CAMPOS.",
+                    "POR FAVOR, COMPLETE TODOS LOS CAMPOS.",
                     "CAMPO VACIO",
                     JOptionPane.WARNING_MESSAGE);
             return;
@@ -83,7 +82,7 @@ public class VentanaRegistro {
         for (Usuario u : VentanaLogin.USUARIOS) {
             if (u.getUsername().equalsIgnoreCase(user)) {
                 JOptionPane.showMessageDialog(frame,
-                        "EL NOMBRE DEL USUARIO YA EXISTE .",
+                        "EL NOMBRE DEL USUARIO YA EXISTE.",
                         "USUARIO EXISTENTE",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -91,7 +90,7 @@ public class VentanaRegistro {
         }
 
         // Agregar el nuevo usuario a la lista compartida
-        VentanaLogin.USUARIOS.add(new Usuario(nombre, user, pass));
+        VentanaLogin.USUARIOS.add(new Usuario(user, pass, nombre));
 
         JOptionPane.showMessageDialog(frame,
                 "¡REGISTRO EXITOSO!",

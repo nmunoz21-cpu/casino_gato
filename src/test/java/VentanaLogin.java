@@ -62,7 +62,20 @@ public class VentanaLogin {
      * ventana o mostrar un mensaje de error.
      */
     private void login() {
-// TODO: Implementar la lógica de inicio de sesión
+        String u= txtUsuario.getText();
+        String p= new String(txtClave.getPassword());
+
+        String nombreUsuario= validarCredenciales(u,p);
+
+        if (!nombreUsuario.isEmpty()){
+            JOptionPane.showMessageDialog(frame,"BIENVENIDO AL CASINO " + nombreUsuario);
+            frame.dispose();
+            // Conecta a la ruleta en consola
+            Ruleta.main(new String[]{});
+        }else{
+            JOptionPane.showMessageDialog(frame,"USUARIO O CONTRASEÑA INCORRECTA");
+        }
+
     }
     /**
      * Valida las credenciales ingresadas utilizando la lista de usuarios.
@@ -85,6 +98,8 @@ public class VentanaLogin {
      * Debe cerrar la ventana actual e invocar a VentanaRegistro.
      */
     private void abrirRegistro() {
-// TODO: Cerrar la ventana actual y abrir la ventana de registro
+        frame.dispose();
+        VentanaRegistro ventanaRegistro = new VentanaRegistro();
+        ventanaRegistro.mostrarVentana();
     }
 }
