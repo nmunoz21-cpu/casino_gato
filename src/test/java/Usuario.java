@@ -10,6 +10,7 @@ public class Usuario {
     }
     // Verifica si las credenciales ingresadas pertenecen al usuario
     public boolean validarCredenciales(String u, String p) {
+
         return this.username.equals(u) && this.password.equals(p);
     }
 
@@ -20,4 +21,5 @@ public class Usuario {
     public String getUsername() {
         return username;
     }
+
 }
