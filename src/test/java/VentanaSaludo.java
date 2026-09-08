@@ -15,8 +15,28 @@ public class VentanaSaludo {
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
 
+        lblSaludo.setText("BIENVENIDO "+nombreUsuario+"!" );
+        lblSaludo.setHorizontalAlignment(SwingConstants.CENTER);
+        lblSaludo.setFont(new Font("Ariel", Font.BOLD,14));
 
+        panel.add(lblSaludo);
+        panel.add(btnJugar);
+        frame.add(panel);
+
+        // Evento para abrir la ruleta al hacer clic
+    btnJugar.addActionListener(e -> iniciarRuleta());
     }
+
+    public void mostrarVentana() {
+        frame.setLocationRelativeTo(null); // Centrar en la pantalla
+        frame.setVisible(true);
+    }
+
+    private void iniciarRuleta() {
+        frame.dispose(); // Cierra esta ventana de saludo
+        Ruleta.main(new String[]{}); // Lanza la ruleta original
+    }
+}
 
 
 
