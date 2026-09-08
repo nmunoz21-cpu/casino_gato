@@ -70,8 +70,8 @@ public class VentanaLogin {
         if (!nombreUsuario.isEmpty()){
             JOptionPane.showMessageDialog(frame,"BIENVENIDO AL CASINO " + nombreUsuario);
             frame.dispose();
-            // Conecta a la ruleta en consola
-            Ruleta.main(new String[]{});
+            VentanaSaludo saludo = new VentanaSaludo(nombreUsuario);
+            saludo.mostrarVentana();
         }else{
             JOptionPane.showMessageDialog(frame,"USUARIO O CONTRASEÑA INCORRECTA");
         }
