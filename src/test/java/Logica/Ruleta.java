@@ -1,81 +1,124 @@
 package Logica;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
- * Motor del juego de Ruleta.
- * Concentra las reglas, el calculo del saldo y el historial de rondas.
- * No conoce nada de Swing.
+ * Lógica de la ruleta (SRP: no sabe nada de ventanas Swing).
+ *
+ * Reglas de saldo:
+ *  - Al apostar se RESTA el monto del saldo.
+ *  - Si gana, se SUMA el doble del monto.
+ *  - Si pierde, no se suma nada.
+ *  - No se puede apostar más de lo que se tiene ni montos <= 0.
  */
 public class Ruleta {
 
-    public static final int MAX_HISTORIAL = 100;
-    public static final int CANTIDAD_NUMEROS = 37;
-    public static final int SALDO_INICIAL = 1000;
+    public static final int SALDO_INICIAL_POR_DEFECTO = 1000;
+    private static final int MULTIPLICADOR_PREMIO = 2;
 
-    private static final int[] NUMEROS_ROJOS = {
+    // Números rojos de la ruleta europea. El 0 es verde; el resto es negro.
+    private static final Set<Integer> ROJOS = Set.of(
             1, 3, 5, 7, 9, 12, 14, 16, 18,
-            19, 21, 23, 25, 27, 30, 32, 34, 36
-    };
+            19, 21, 23, 25, 27, 30, 32, 34, 36);
 
-    private final Random rng = new Random();
+    private final Random random = new Random();
+    private final List<ResultadoRonda> historial = new ArrayList<>();
     private int saldo;
 
-    private final int[] historialNumeros = new int[MAX_HISTORIAL];
-    private final int[] historialApuestas = new int[MAX_HISTORIAL];
-    private final boolean[] historialAciertos = new boolean[MAX_HISTORIAL];
-    private int historialSize = 0;
-
     public Ruleta() {
-        this.saldo = SALDO_INICIAL;
+        this(SALDO_INICIAL_POR_DEFECTO);
     }
 
-    public ResultadoRonda jugar(int monto, char tipo) {
-        int numero = girar();
-        boolean acierto = evaluarResultado(numero, tipo);
-        actualizarSaldo(monto, acierto);
-        registrarResultado(numero, monto, acierto);
-        return new ResultadoRonda(numero, esRojo(numero), tipo, monto, acierto, saldo);
+    public Ruleta(int saldoInicial) {
+        if (saldoInicial < 0) {
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
+        }
+        this.saldo = saldoInicial;
     }
 
-    private int girar() {
-        return rng.nextInt(CANTIDAD_NUMEROS);
+    /**
+     * Juega una ronda.
+     *
+     * @param tipoApuesta "Color", "Paridad" o "Numero"
+     * @param seleccion   "Rojo"/"Negro", "Par"/"Impar", o un número "0".."36"
+     * @param monto       cantidad a apostar
+     * @throws IllegalArgumentException si la apuesta no es válida
+     */
+    public ResultadoRonda jugar(String tipoApuesta, String seleccion, int monto) {
+        validarApuesta(tipoApuesta, seleccion, monto);
+
+        saldo -= monto; // se descuenta al apostar
+
+        int numero = random.nextInt(37); // 0 a 36
+        String color = colorDe(numero);
+        boolean gano = evaluar(tipoApuesta, seleccion, numero, color);
+
+        if (gano) {
+            saldo += monto * MULTIPLICADOR_PREMIO; // devuelve el doble
+        }
+
+        ResultadoRonda resultado = new ResultadoRonda(
+                numero, color, tipoApuesta, seleccion, monto, gano, saldo);
+        historial.add(resultado);
+        return resultado;
     }
 
-    private boolean evaluarResultado(int numero, char tipo) {
-        if (numero == 0) return false;
-        switch (tipo) {
-            case 'R': return esRojo(numero);
-            case 'N': return !esRojo(numero);
-            case 'P': return numero % 2 == 0;
-            case 'I': return numero % 2 != 0;
-            default: return false;
+    private void validarApuesta(String tipoApuesta, String seleccion, int monto) {
+        if (tipoApuesta == null || seleccion == null) {
+            throw new IllegalArgumentException("Debes elegir el tipo de apuesta y tu selección");
+        }
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a 0");
+        }
+        if (monto > saldo) {
+            throw new IllegalArgumentException(
+                    "Saldo insuficiente: tienes $" + saldo + " y quieres apostar $" + monto);
+        }
+        if (tipoApuesta.equals("Numero")) {
+            try {
+                int n = Integer.parseInt(seleccion);
+                if (n < 0 || n > 36) {
+                    throw new IllegalArgumentException("El número debe estar entre 0 y 36");
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("El número apostado no es válido");
+            }
         }
     }
 
-    private boolean esRojo(int numero) {
-        for (int rojo : NUMEROS_ROJOS) {
-            if (numero == rojo) return true;
-        }
-        return false;
-    }
-
-    private void actualizarSaldo(int monto, boolean acierto) {
-        saldo += acierto ? monto : -monto;
-    }
-
-    private void registrarResultado(int numero, int monto, boolean acierto) {
-        if (historialSize < MAX_HISTORIAL) {
-            historialNumeros[historialSize] = numero;
-            historialApuestas[historialSize] = monto;
-            historialAciertos[historialSize] = acierto;
-            historialSize++;
+    private boolean evaluar(String tipoApuesta, String seleccion, int numero, String color) {
+        switch (tipoApuesta) {
+            case "Color":
+                return color.equals(seleccion);
+            case "Paridad":
+                if (numero == 0) {
+                    return false; // el 0 no es par ni impar para la apuesta
+                }
+                return (numero % 2 == 0) ? seleccion.equals("Par") : seleccion.equals("Impar");
+            case "Numero":
+                return Integer.parseInt(seleccion) == numero;
+            default:
+                throw new IllegalArgumentException("Tipo de apuesta desconocido: " + tipoApuesta);
         }
     }
 
-    public int getSaldo() { return saldo; }
-    public int getHistorialSize() { return historialSize; }
-    public int[] getHistorialNumeros() { return historialNumeros; }
-    public int[] getHistorialApuestas() { return historialApuestas; }
-    public boolean[] getHistorialAciertos() { return historialAciertos; }
+    private String colorDe(int numero) {
+        if (numero == 0) {
+            return "Verde";
+        }
+        return ROJOS.contains(numero) ? "Rojo" : "Negro";
+    }
+
+    public int getSaldo() {
+        return saldo;
+    }
+
+    /** Vista de solo lectura para que VentanaHistorial la muestre sin poder modificarla. */
+    public List<ResultadoRonda> getHistorial() {
+        return Collections.unmodifiableList(historial);
+    }
 }
