@@ -1,3 +1,7 @@
+package Ventanas;
+
+import Logica.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +13,7 @@ public class VentanaRegistro {
     private final JLabel lblNombre = new JLabel("Nombre Completo:");
     private final JTextField txtNombre = new JTextField();
 
-    private final JLabel lblUsuario = new JLabel("Usuario:");
+    private final JLabel lblUsuario = new JLabel("Logica.Usuario:");
     private final JTextField txtUsuario = new JTextField();
 
     private final JLabel lblClave = new JLabel("Contraseña:");

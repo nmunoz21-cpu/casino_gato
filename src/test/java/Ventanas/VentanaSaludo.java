@@ -1,3 +1,7 @@
+package Ventanas;
+
+import Logica.Ruleta;
+
 import javax.swing.*;
 import java.awt.*;
 

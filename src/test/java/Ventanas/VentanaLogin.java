@@ -1,3 +1,7 @@
+package Ventanas;
+
+import Logica.Usuario;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
@@ -9,7 +13,7 @@ public class VentanaLogin {
     public static final List <Usuario> USUARIOS = new ArrayList<>();
     // --- Componentes de la interfaz gráfica ---
     private final JFrame frame = new JFrame("Login - Casino Black Cat");
-    private final JLabel lblUsuario = new JLabel("Usuario:");
+    private final JLabel lblUsuario = new JLabel("Logica.Usuario:");
     private final JTextField txtUsuario = new JTextField();
     private final JLabel lblClave = new JLabel("Clave:");
     private final JPasswordField txtClave = new JPasswordField();
@@ -95,7 +99,7 @@ public class VentanaLogin {
     }
     /**
      * Abre la ventana de registro para crear un nuevo usuario.
-     * Debe cerrar la ventana actual e invocar a VentanaRegistro.
+     * Debe cerrar la ventana actual e invocar a Ventanas.VentanaRegistro.
      */
     private void abrirRegistro() {
         frame.dispose();

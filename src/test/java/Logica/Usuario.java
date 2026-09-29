@@ -1,3 +1,5 @@
+package Logica;
+
 public class Usuario {
     private String username;
     private String password;
