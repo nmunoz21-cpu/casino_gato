@@ -50,7 +50,7 @@ public class VentanaMenu {
     }
 
     private void abrirVentanaRuleta() {
-        VentanaRuleta ventanaRuleta = new VentanaRuleta(nombreUsuario);
+        ventanas.VentanaRuleta ventanaRuleta = new ventanas.VentanaRuleta(nombreUsuario);
         ventanaRuleta.mostrarVentana();
     }
 

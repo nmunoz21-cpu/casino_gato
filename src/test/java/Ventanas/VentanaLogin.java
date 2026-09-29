@@ -74,8 +74,8 @@ public class VentanaLogin {
         if (!nombreUsuario.isEmpty()){
             JOptionPane.showMessageDialog(frame,"BIENVENIDO AL CASINO " + nombreUsuario);
             frame.dispose();
-            VentanaSaludo saludo = new VentanaSaludo(nombreUsuario);
-            saludo.mostrarVentana();
+            VentanaMenu ventanaMenu = new VentanaMenu(nombreUsuario);
+            ventanaMenu.mostrarVentana();
         }else{
             JOptionPane.showMessageDialog(frame,"USUARIO O CONTRASEÑA INCORRECTA");
         }
