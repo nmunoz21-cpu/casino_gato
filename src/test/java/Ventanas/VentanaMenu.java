@@ -1,11 +1,15 @@
 package Ventanas;
 
+import Logica.Ruleta;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaMenu {
 
     private final String nombreUsuario;
+    // Una sola Ruleta por sesión: conserva saldo e historial entre ventanas
+    private final Ruleta ruleta = new Ruleta();
     private final JFrame frame = new JFrame("RULETA - Casino Black Cat");
 
     public VentanaMenu(String nombreUsuario) {
@@ -39,7 +43,7 @@ public class VentanaMenu {
                 "Bienvenido/a al menu principal, " + nombreUsuario + ".\n" +
                         "A la izquierda tienes:\n" +
                         "- Jugar: abre la ventana de juego.\n" +
-                        "- Historial: abre la ventana de historial (se implementara aparte).\n" +
+                        "- Historial: muestra las rondas jugadas.\n" +
                         "- Salir: cierra sesion y vuelve al login."
         );
         areaInfo.setEditable(false);
@@ -50,12 +54,17 @@ public class VentanaMenu {
     }
 
     private void abrirVentanaRuleta() {
-        ventanas.VentanaRuleta ventanaRuleta = new ventanas.VentanaRuleta(nombreUsuario);
+        frame.setVisible(false); // el menú se oculta mientras se juega
+        VentanaRuleta ventanaRuleta =
+                new VentanaRuleta(nombreUsuario, ruleta, this::mostrarVentana);
         ventanaRuleta.mostrarVentana();
     }
 
     private void abrirVentanaHistorial() {
-        // Pendiente: se implementara en una proxima iteracion.
+        frame.setVisible(false);
+        VentanaHistorial ventanaHistorial =
+                new VentanaHistorial(ruleta.getHistorial(), this::mostrarVentana);
+        ventanaHistorial.mostrarVentana();
     }
 
     private void cerrarSesion() {
