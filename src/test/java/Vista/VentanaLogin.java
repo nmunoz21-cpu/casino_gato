@@ -1,6 +1,6 @@
-package Ventanas;
+package Vista;
 
-import Logica.Usuario;
+import Modelo.Usuario;
 
 import javax.swing.*;
 import java.awt.*;

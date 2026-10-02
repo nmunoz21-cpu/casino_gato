@@ -1,4 +1,4 @@
-package Logica;
+package Modelo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +18,7 @@ public class Ruleta {
             19, 21, 23, 25, 27, 30, 32, 34, 36);
 
     private final Random random = new Random();
-    private final List<ResultadoRonda> historial = new ArrayList<>();
+    private final List<Resultado> historial = new ArrayList<>();
     private int saldo;
 
     public Ruleta() {
@@ -37,7 +37,7 @@ public class Ruleta {
      * @param tipo  'R' rojo, 'N' negro, 'P' par, 'I' impar
      * @throws IllegalArgumentException si la apuesta no es válida
      */
-    public ResultadoRonda jugar(int monto, char tipo) {
+    public Resultado jugar(int monto, char tipo) {
         if (tipo != 'R' && tipo != 'N' && tipo != 'P' && tipo != 'I') {
             throw new IllegalArgumentException("Tipo de apuesta desconocido: " + tipo);
         }
@@ -59,7 +59,7 @@ public class Ruleta {
             saldo += monto * MULTIPLICADOR_PREMIO;
         }
 
-        ResultadoRonda resultado = new ResultadoRonda(numero, rojo, tipo, monto, acierto, saldo);
+        Resultado resultado = new Resultado(numero, rojo, tipo, monto, acierto, saldo);
         historial.add(resultado);
         return resultado;
     }
@@ -81,7 +81,7 @@ public class Ruleta {
     }
 
     /** Solo lectura, para que VentanaHistorial la muestre. */
-    public List<ResultadoRonda> getHistorial() {
+    public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
     }
 }

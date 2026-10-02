@@ -1,7 +1,7 @@
-package Ventanas;
+package Vista;
 
-import Logica.ResultadoRonda;
-import Logica.Ruleta;
+import Modelo.Resultado;
+import Modelo.Ruleta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -100,7 +100,7 @@ public class VentanaRuleta {
         char tipo = obtenerTipoApuestaSeleccionado();
         int monto = (int) spinnerMonto.getValue();
         try {
-            ResultadoRonda resultado = ruleta.jugar(monto, tipo);
+            Resultado resultado = ruleta.jugar(monto, tipo);
             actualizarInterfaz(resultado);
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(),
@@ -119,7 +119,7 @@ public class VentanaRuleta {
         }
     }
 
-    private void actualizarInterfaz(ResultadoRonda resultado) {
+    private void actualizarInterfaz(Resultado resultado) {
         String estado = resultado.isAcierto() ? "GANASTE" : "PERDISTE";
 
         lblResultado.setText(String.format(

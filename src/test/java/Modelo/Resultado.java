@@ -1,7 +1,7 @@
-package Logica;
+package Modelo;
 
 /** Resultado inmutable de una ronda. */
-public class ResultadoRonda {
+public class Resultado {
 
     private final int numero;
     private final boolean rojo;
@@ -10,8 +10,8 @@ public class ResultadoRonda {
     private final boolean acierto;
     private final int saldoActual;
 
-    public ResultadoRonda(int numero, boolean rojo, char tipoApuesta,
-                          int monto, boolean acierto, int saldoActual) {
+    public Resultado(int numero, boolean rojo, char tipoApuesta,
+                     int monto, boolean acierto, int saldoActual) {
         this.numero = numero;
         this.rojo = rojo;
         this.tipoApuesta = tipoApuesta;

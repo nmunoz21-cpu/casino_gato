@@ -1,6 +1,6 @@
-package Ventanas;
+package Vista;
 
-import Logica.ResultadoRonda;
+import Modelo.Resultado;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -11,11 +11,11 @@ import java.util.List;
 
 public class VentanaHistorial {
 
-    private final List<ResultadoRonda> historial;
+    private final List<Resultado> historial;
     private final Runnable alVolver;
     private final JFrame frame = new JFrame("HISTORIAL - Casino Black Cat");
 
-    public VentanaHistorial(List<ResultadoRonda> historial, Runnable alVolver) {
+    public VentanaHistorial(List<Resultado> historial, Runnable alVolver) {
         this.historial = historial;
         this.alVolver = alVolver;
         configurarVentana();
@@ -45,7 +45,7 @@ public class VentanaHistorial {
         };
 
         int n = 1;
-        for (ResultadoRonda r : historial) {
+        for (Resultado r : historial) {
             modelo.addRow(new Object[]{
                     n++,
                     r.getNumero(),

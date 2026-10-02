@@ -1,6 +1,6 @@
 package Launcher;
 
-import Ventanas.VentanaLogin;
+import Vista.VentanaLogin;
 
 /**
  * Punto de entrada de la aplicacion.

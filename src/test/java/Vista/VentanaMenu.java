@@ -1,6 +1,6 @@
-package Ventanas;
+package Vista;
 
-import Logica.Ruleta;
+import Modelo.Ruleta;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-import Logica.Usuario;
+import Modelo.Usuario;
 
 
 public class SessionController {
