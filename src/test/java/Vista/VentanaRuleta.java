@@ -1,7 +1,7 @@
 package Vista;
 
+import Controlador.RuletaController;
 import Modelo.Resultado;
-import Modelo.Ruleta;
 import Modelo.TipoApuesta;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ import java.awt.event.WindowEvent;
 public class VentanaRuleta {
 
     private final String nombreUsuario;
-    private final Ruleta ruleta;
+    private final RuletaController controlador;
     private final Runnable alVolver; // qué hacer al cerrar (normalmente reabrir el menú)
 
     private final JFrame frame = new JFrame("RULETA - Casino Black Cat");
@@ -24,12 +24,12 @@ public class VentanaRuleta {
     private JLabel lblResultado;
 
     /**
-     * @param ruleta   la misma instancia del menú, para conservar saldo e historial
-     * @param alVolver acción al cerrar la ventana (puede ser null)
+     * @param controlador controlador compartido con el menú, para conservar saldo e historial
+     * @param alVolver    acción al cerrar la ventana (puede ser null)
      */
-    public VentanaRuleta(String nombreUsuario, Ruleta ruleta, Runnable alVolver) {
+    public VentanaRuleta(String nombreUsuario, RuletaController controlador, Runnable alVolver) {
         this.nombreUsuario = nombreUsuario;
-        this.ruleta = ruleta;
+        this.controlador = controlador;
         this.alVolver = alVolver;
         configurarVentana();
         construirInterfaz();
@@ -61,7 +61,7 @@ public class VentanaRuleta {
         spinnerMonto.setEditor(new JSpinner.NumberEditor(spinnerMonto, "#")); // sin separador de miles
 
         JButton btnGirar = new JButton("Girar");
-        lblSaldo = new JLabel("Saldo: $" + ruleta.getSaldo());
+        lblSaldo = new JLabel("Saldo: $" + controlador.getSaldo());
         lblResultado = new JLabel(" ");
 
         comboTipoApuesta.addActionListener(e -> actualizarSelectores());
@@ -101,7 +101,7 @@ public class VentanaRuleta {
         TipoApuesta tipo = obtenerTipoApuestaSeleccionado();
         int monto = (int) spinnerMonto.getValue();
         try {
-            Resultado resultado = ruleta.jugar(monto, tipo);
+            Resultado resultado = controlador.realizarApuesta(monto, tipo);
             actualizarInterfaz(resultado);
         } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame, ex.getMessage(),
@@ -132,5 +132,4 @@ public class VentanaRuleta {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
-
 }
