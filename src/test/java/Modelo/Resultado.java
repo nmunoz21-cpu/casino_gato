@@ -5,12 +5,12 @@ public class Resultado {
 
     private final int numero;
     private final boolean rojo;
-    private final char tipoApuesta; // 'R', 'N', 'P', 'I'
+    private final TipoApuesta tipoApuesta;
     private final int monto;
     private final boolean acierto;
     private final int saldoActual;
 
-    public Resultado(int numero, boolean rojo, char tipoApuesta,
+    public Resultado(int numero, boolean rojo, TipoApuesta tipoApuesta,
                      int monto, boolean acierto, int saldoActual) {
         this.numero = numero;
         this.rojo = rojo;
@@ -22,7 +22,7 @@ public class Resultado {
 
     public int getNumero() { return numero; }
     public boolean isRojo() { return rojo; }
-    public char getTipoApuesta() { return tipoApuesta; }
+    public TipoApuesta getTipoApuesta() { return tipoApuesta; }
     public int getMonto() { return monto; }
     public boolean isAcierto() { return acierto; }
     public int getSaldoActual() { return saldoActual; }
@@ -37,7 +37,7 @@ public class Resultado {
 
     @Override
     public String toString() {
-        return String.format("Numero %d (%s) | Apuesta=%c | Monto=$%d | %s | Saldo=$%d",
+        return String.format("Numero %d (%s) | Apuesta=%s | Monto=$%d | %s | Saldo=$%d",
                 numero, getColor(), tipoApuesta, monto,
                 acierto ? "GANASTE" : "PERDISTE", saldoActual);
     }
