@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.Set;
 
 /**
+ *  administra el saldo, aplica las reglas de apuesta
+ * y guarda el historial de resultados.
  */
 public class Ruleta {
 
@@ -21,10 +23,12 @@ public class Ruleta {
     private final List<Resultado> historial = new ArrayList<>();
     private int saldo;
 
+    // Crea la ruleta con saldo cero
     public Ruleta() {
         this(SALDO_INICIAL);
     }
 
+    // Crea la ruleta con un saldo inicial determinado
     public Ruleta(int saldoInicial) {
         if (saldoInicial < 0) {
             throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
@@ -34,12 +38,12 @@ public class Ruleta {
 
     /**
      * @param monto cantidad apostada
-     * @param tipo  'R' rojo, 'N' negro, 'P' par, 'I' impar
+     * @param tipo  tipo de apuesta (ROJO, NEGRO, PAR o IMPAR)
      * @throws IllegalArgumentException si la apuesta no es válida
      */
-    public Resultado jugar(int monto, char tipo) {
-        if (tipo != 'R' && tipo != 'N' && tipo != 'P' && tipo != 'I') {
-            throw new IllegalArgumentException("Tipo de apuesta desconocido: " + tipo);
+    public Resultado jugar(int monto, TipoApuesta tipo) {
+        if (tipo == null) {
+            throw new IllegalArgumentException("Debes elegir un tipo de apuesta");
         }
         if (monto <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
@@ -64,26 +68,16 @@ public class Ruleta {
         return resultado;
     }
 
-    private boolean evaluar(char tipo, int numero, boolean rojo) {
+    private boolean evaluar(TipoApuesta tipo, int numero, boolean rojo) {
         if (numero == 0) {
             return false; // el 0 pierde en color y paridad
         }
-        switch (tipo) {
-            case 'R': return rojo;
-            case 'N': return !rojo;
-            case 'P': return numero % 2 == 0;
-            default:  return numero % 2 != 0; // 'I'
-        }
-    }
-
-
-    public int getSaldo() {
-        return saldo;
-    }
-
-    /** Solo lectura, para que VentanaHistorial la muestre. */
-    public List<Resultado> getHistorial() {
-        return Collections.unmodifiableList(historial);
+        return switch (tipo) {
+            case ROJO  -> rojo;
+            case NEGRO -> !rojo;
+            case PAR   -> numero % 2 == 0;
+            case IMPAR -> numero % 2 != 0;
+        };
     }
 
     // Recarga el saldo de la ruleta. Solo acepta montos mayores a 0,
@@ -93,5 +87,14 @@ public class Ruleta {
             throw new IllegalArgumentException("El monto a depositar debe ser mayor a 0");
         }
         saldo += monto;
+    }
+
+    public int getSaldo() {
+        return saldo;
+    }
+
+    /** Solo lectura, para que VentanaHistorial la muestre. */
+    public List<Resultado> getHistorial() {
+        return Collections.unmodifiableList(historial);
     }
 }

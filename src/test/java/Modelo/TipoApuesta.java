@@ -1,4 +1,6 @@
 package Modelo;
 
-public class TipoApuesta {
+// Tipos de apuesta permitidos en la ruleta
+public enum TipoApuesta {
+    ROJO, NEGRO, PAR, IMPAR
 }
