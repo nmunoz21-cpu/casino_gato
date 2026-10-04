@@ -24,4 +24,15 @@ public class Usuario {
         return username;
     }
 
+    // Actualiza el nombre del usuario. No acepta valores nulos ni vacíos
+    // para que el objeto nunca quede con un nombre inválido.
+    public void setNombre(String nombre){
+        if (nombre != null && !nombre.isBlank()){
+            this.nombre= nombre;
+        }else{
+            throw new IllegalArgumentException("El nombre no puede estar vacío");
+        }
+    }
+
+
 }
