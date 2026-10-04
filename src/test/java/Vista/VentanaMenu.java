@@ -1,20 +1,21 @@
 package Vista;
 
 import Controlador.RuletaController;
+import Controlador.SessionController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaMenu {
 
-    private final String nombreUsuario;
-    // El controlador se crea afuera y se comparte: conserva saldo e historial entre ventanas
+    // Los controladores se crean en el Launcher y se comparten entre ventanas
+    private final SessionController session;
     private final RuletaController controlador;
     private final JFrame frame = new JFrame("RULETA - Casino Black Cat");
     private JLabel lblSaldo;
 
-    public VentanaMenu(String nombreUsuario, RuletaController controlador) {
-        this.nombreUsuario = nombreUsuario;
+    public VentanaMenu(SessionController session, RuletaController controlador) {
+        this.session = session;
         this.controlador = controlador;
         configurarVentana();
         construirInterfaz();
@@ -38,14 +39,14 @@ public class VentanaMenu {
         btnHistorial.addActionListener(e -> abrirVentanaHistorial());
         btnSalir.addActionListener(e -> cerrarSesion());
 
-        panelBotones.add(new JLabel(nombreUsuario));
+        panelBotones.add(new JLabel(session.getNombreUsuario()));
         panelBotones.add(lblSaldo);
         panelBotones.add(btnJugar);
         panelBotones.add(btnHistorial);
         panelBotones.add(btnSalir);
 
         JTextArea areaInfo = new JTextArea(
-                "Bienvenido/a al menu principal, " + nombreUsuario + ".\n" +
+                "Bienvenido/a al menu principal, " + session.getNombreUsuario() + ".\n" +
                         "A la izquierda tienes:\n" +
                         "- Jugar: abre la ventana de juego.\n" +
                         "- Historial: muestra las rondas jugadas.\n" +
@@ -65,8 +66,8 @@ public class VentanaMenu {
 
     private void abrirVentanaRuleta() {
         frame.setVisible(false); // el menú se oculta mientras se juega
-        VentanaRuleta ventanaRuleta =
-                new VentanaRuleta(nombreUsuario, controlador, this::mostrarVentana);
+        VentanaRuleta ventanaRuleta = new VentanaRuleta(
+                session.getNombreUsuario(), controlador, this::mostrarVentana);
         ventanaRuleta.mostrarVentana();
     }
 
@@ -78,8 +79,9 @@ public class VentanaMenu {
     }
 
     private void cerrarSesion() {
+        session.cerrarSesion();
         frame.dispose();
-        VentanaLogin ventanaLogin = new VentanaLogin();
+        VentanaLogin ventanaLogin = new VentanaLogin(session, controlador);
         ventanaLogin.mostrarVentana();
     }
 

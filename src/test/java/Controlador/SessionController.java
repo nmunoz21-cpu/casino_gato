@@ -1,40 +1,57 @@
+package Controlador;
+
 import Modelo.Usuario;
 
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Administra los usuarios registrados y la sesión activa.
+ * Las ventanas lo reciben por constructor: todas comparten la misma instancia.
+ */
 public class SessionController {
 
+    private final List<Usuario> usuarios = new ArrayList<>();
     private Usuario usuarioActual;
-    public void registrarUsuario(String usuario, String clave, String nombre) {
-        if (usuario == null || usuario.isBlank() || clave == null || clave.isBlank() ||
-                nombre == null || nombre.isBlank()) {
+
+    public SessionController() {
+        // Usuarios de prueba (antes vivían en VentanaLogin)
+        usuarios.add(new Usuario("Nure", "1234", "Nureddin"));
+        usuarios.add(new Usuario("admin", "1234", "Administrador"));
+    }
+
+    // Registra un usuario nuevo. Rechaza datos vacíos y usernames repetidos.
+    public void registrarUsuario(String username, String clave, String nombre) {
+        if (username == null || username.isBlank() || clave == null || clave.isBlank()
+                || nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("Datos requeridos");
         }
-        usuarioActual = new Usuario(usuario, clave, nombre);
+        for (Usuario u : usuarios) {
+            if (u.getUsername().equals(username)) {
+                throw new IllegalArgumentException("El usuario ya existe");
+            }
+        }
+        usuarios.add(new Usuario(username, clave, nombre));
     }
 
-
-    public boolean iniciarSesion(String usuario, String clave) {
-        if (usuarioActual == null) return false;
-        return usuarioActual.validarCredenciales(usuario, clave);
+    // Si las credenciales coinciden con un usuario, lo deja como usuario actual
+    public boolean iniciarSesion(String username, String clave) {
+        for (Usuario u : usuarios) {
+            if (u.validarCredenciales(username, clave)) {
+                usuarioActual = u;
+                return true;
+            }
+        }
+        return false;
     }
-
 
     public boolean hayUsuario() {
         return usuarioActual != null;
     }
 
-
     public String getNombreUsuario() {
-        return hayUsuario()
-                ? usuarioActual.getNombre()
-                : "";
+        return hayUsuario() ? usuarioActual.getNombre() : "";
     }
-
-
-    public Usuario getUsuarioActual() {
-        return usuarioActual;
-    }
-
 
     public void cerrarSesion() {
         usuarioActual = null;
