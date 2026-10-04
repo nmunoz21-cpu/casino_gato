@@ -2,6 +2,7 @@ package Vista;
 
 import Modelo.Resultado;
 import Modelo.Ruleta;
+import Modelo.TipoApuesta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,8 +17,8 @@ public class VentanaRuleta {
 
     private final JFrame frame = new JFrame("RULETA - Casino Black Cat");
     private JComboBox<String> comboTipoApuesta;
-    private JComboBox<String> comboColor;
-    private JComboBox<String> comboParidad;
+    private JComboBox<TipoApuesta> comboColor;
+    private JComboBox<TipoApuesta> comboParidad;
     private JSpinner spinnerMonto;
     private JLabel lblSaldo;
     private JLabel lblResultado;
@@ -53,8 +54,8 @@ public class VentanaRuleta {
         JPanel panel = new JPanel(new GridLayout(5, 2, 5, 5));
 
         comboTipoApuesta = new JComboBox<>(new String[]{"Color", "Paridad"});
-        comboColor = new JComboBox<>(new String[]{"Rojo", "Negro"});
-        comboParidad = new JComboBox<>(new String[]{"Par", "Impar"});
+        comboColor = new JComboBox<>(new TipoApuesta[]{TipoApuesta.ROJO, TipoApuesta.NEGRO});
+        comboParidad = new JComboBox<>(new TipoApuesta[]{TipoApuesta.PAR, TipoApuesta.IMPAR});
 
         spinnerMonto = new JSpinner(new SpinnerNumberModel(100, 1, 100000, 10));
         spinnerMonto.setEditor(new JSpinner.NumberEditor(spinnerMonto, "#")); // sin separador de miles
@@ -97,7 +98,7 @@ public class VentanaRuleta {
     }
 
     private void jugarRonda() {
-        char tipo = obtenerTipoApuestaSeleccionado();
+        TipoApuesta tipo = obtenerTipoApuestaSeleccionado();
         int monto = (int) spinnerMonto.getValue();
         try {
             Resultado resultado = ruleta.jugar(monto, tipo);
@@ -108,22 +109,18 @@ public class VentanaRuleta {
         }
     }
 
-    private char obtenerTipoApuestaSeleccionado() {
-        String tipoApuesta = (String) comboTipoApuesta.getSelectedItem();
-        if ("Color".equals(tipoApuesta)) {
-            String color = (String) comboColor.getSelectedItem();
-            return "Rojo".equals(color) ? 'R' : 'N';
-        } else {
-            String paridad = (String) comboParidad.getSelectedItem();
-            return "Par".equals(paridad) ? 'P' : 'I';
+    private TipoApuesta obtenerTipoApuestaSeleccionado() {
+        if ("Color".equals(comboTipoApuesta.getSelectedItem())) {
+            return (TipoApuesta) comboColor.getSelectedItem();
         }
+        return (TipoApuesta) comboParidad.getSelectedItem();
     }
 
     private void actualizarInterfaz(Resultado resultado) {
         String estado = resultado.isAcierto() ? "GANASTE" : "PERDISTE";
 
         lblResultado.setText(String.format(
-                "Numero %d (%s) | Apuesta=%c | Monto=$%d | %s",
+                "Numero %d (%s) | Apuesta=%s | Monto=$%d | %s",
                 resultado.getNumero(), resultado.getColor(), resultado.getTipoApuesta(),
                 resultado.getMonto(), estado
         ));
@@ -135,4 +132,5 @@ public class VentanaRuleta {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
+
 }
