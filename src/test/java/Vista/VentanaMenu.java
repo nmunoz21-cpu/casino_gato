@@ -1,6 +1,6 @@
 package Vista;
 
-import Modelo.Ruleta;
+import Controlador.RuletaController;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,12 +8,14 @@ import java.awt.*;
 public class VentanaMenu {
 
     private final String nombreUsuario;
-    // Una sola Ruleta por sesión: conserva saldo e historial entre ventanas
-    private final Ruleta ruleta = new Ruleta();
+    // El controlador se crea afuera y se comparte: conserva saldo e historial entre ventanas
+    private final RuletaController controlador;
     private final JFrame frame = new JFrame("RULETA - Casino Black Cat");
+    private JLabel lblSaldo;
 
-    public VentanaMenu(String nombreUsuario) {
+    public VentanaMenu(String nombreUsuario, RuletaController controlador) {
         this.nombreUsuario = nombreUsuario;
+        this.controlador = controlador;
         configurarVentana();
         construirInterfaz();
     }
@@ -24,17 +26,20 @@ public class VentanaMenu {
     }
 
     private void construirInterfaz() {
-        JPanel panelBotones = new JPanel(new GridLayout(4, 1, 5, 5));
+        JPanel panelBotones = new JPanel(new GridLayout(5, 1, 5, 5));
 
         JButton btnJugar = new JButton("Jugar");
         JButton btnHistorial = new JButton("Historial");
         JButton btnSalir = new JButton("Salir");
+        lblSaldo = new JLabel();
+        actualizarSaldo();
 
         btnJugar.addActionListener(e -> abrirVentanaRuleta());
         btnHistorial.addActionListener(e -> abrirVentanaHistorial());
         btnSalir.addActionListener(e -> cerrarSesion());
 
         panelBotones.add(new JLabel(nombreUsuario));
+        panelBotones.add(lblSaldo);
         panelBotones.add(btnJugar);
         panelBotones.add(btnHistorial);
         panelBotones.add(btnSalir);
@@ -53,17 +58,22 @@ public class VentanaMenu {
         frame.add(areaInfo, BorderLayout.CENTER);
     }
 
+    // Consulta siempre el saldo mediante el getter del controlador
+    private void actualizarSaldo() {
+        lblSaldo.setText("Saldo: $" + controlador.getSaldo());
+    }
+
     private void abrirVentanaRuleta() {
         frame.setVisible(false); // el menú se oculta mientras se juega
         VentanaRuleta ventanaRuleta =
-                new VentanaRuleta(nombreUsuario, ruleta, this::mostrarVentana);
+                new VentanaRuleta(nombreUsuario, controlador, this::mostrarVentana);
         ventanaRuleta.mostrarVentana();
     }
 
     private void abrirVentanaHistorial() {
         frame.setVisible(false);
         VentanaHistorial ventanaHistorial =
-                new VentanaHistorial(ruleta.getHistorial(), this::mostrarVentana);
+                new VentanaHistorial(controlador.getHistorial(), this::mostrarVentana);
         ventanaHistorial.mostrarVentana();
     }
 
@@ -74,6 +84,7 @@ public class VentanaMenu {
     }
 
     public void mostrarVentana() {
+        actualizarSaldo(); // al volver de jugar, el saldo se refresca
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
