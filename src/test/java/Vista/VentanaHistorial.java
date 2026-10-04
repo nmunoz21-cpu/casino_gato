@@ -1,6 +1,7 @@
 package Vista;
 
 import Modelo.Resultado;
+import Modelo.TipoApuesta;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -72,13 +73,13 @@ public class VentanaHistorial {
         frame.add(sur, BorderLayout.SOUTH);
     }
 
-    private String nombreApuesta(char tipo) {
-        switch (tipo) {
-            case 'R': return "Rojo";
-            case 'N': return "Negro";
-            case 'P': return "Par";
-            default:  return "Impar";
-        }
+    private String nombreApuesta(TipoApuesta tipo) {
+        return switch (tipo) {
+            case ROJO  -> "Rojo";
+            case NEGRO -> "Negro";
+            case PAR   -> "Par";
+            case IMPAR -> "Impar";
+        };
     }
 
     public void mostrarVentana() {
