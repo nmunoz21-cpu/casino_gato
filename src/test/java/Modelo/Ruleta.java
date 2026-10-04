@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class Ruleta {
 
-    public static final int SALDO_INICIAL = 1000;
+    public static final int SALDO_INICIAL = 0;
     private static final int MULTIPLICADOR_PREMIO = 2;
 
     private static final Set<Integer> ROJOS = Set.of(
@@ -76,6 +76,7 @@ public class Ruleta {
         }
     }
 
+
     public int getSaldo() {
         return saldo;
     }
@@ -83,5 +84,14 @@ public class Ruleta {
     /** Solo lectura, para que VentanaHistorial la muestre. */
     public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
+    }
+
+    // Recarga el saldo de la ruleta. Solo acepta montos mayores a 0,
+    // para que el saldo nunca disminuya ni quede inconsistente por un depósito.
+    public void depositar(int monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a depositar debe ser mayor a 0");
+        }
+        saldo += monto;
     }
 }

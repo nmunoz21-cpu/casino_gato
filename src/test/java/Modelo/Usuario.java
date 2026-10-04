@@ -19,7 +19,7 @@ public class Usuario {
     public String getNombre() {
         return nombre;
     }
-    //registro de nuevos jugadores
+    //Devuelve el nombre de usuario con el que inicia sesión.
     public String getUsername() {
         return username;
     }
@@ -33,6 +33,4 @@ public class Usuario {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
     }
-
-
 }
