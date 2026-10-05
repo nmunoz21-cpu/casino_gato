@@ -1,11 +1,16 @@
 package Vista;
 
-import Modelo.Usuario;
+import Controlador.RuletaController;
+import Controlador.SessionController;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class VentanaRegistro {
+
+    // Los controladores se crean en el Launcher y se comparten entre ventanas
+    private final SessionController session;
+    private final RuletaController ruletaController;
 
     // --- Componentes de la interfaz gráfica ---
     private final JFrame frame = new JFrame("Registro - Casino Black Cat");
@@ -24,8 +29,14 @@ public class VentanaRegistro {
 
     /**
      * Constructor que inicializa la ventana de registro.
+     *
+     * @param session          sesión compartida, donde se guardan los usuarios
+     * @param ruletaController controlador de la ruleta, que se devuelve al login
      */
-    public VentanaRegistro() {
+    public VentanaRegistro(SessionController session, RuletaController ruletaController) {
+        this.session = session;
+        this.ruletaController = ruletaController;
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(380, 250);
 
@@ -58,43 +69,33 @@ public class VentanaRegistro {
     }
 
     /**
-     * Cierra la ventana actual y vuelve a la ventana de Login.
+     * Cierra la ventana actual y vuelve a la ventana de Login,
+     * entregándole los mismos controladores.
      */
     private void volverLogin() {
         frame.dispose();
-        SwingUtilities.invokeLater(() -> new VentanaLogin().mostrarVentana());
+        SwingUtilities.invokeLater(() ->
+                new VentanaLogin(session, ruletaController).mostrarVentana());
     }
 
     /**
-     * Valida los campos y agrega un nuevo usuario a la lista.
+     * Envía los datos a la sesión. Las reglas (campos vacíos, usuario repetido)
+     * las aplica el controlador; la Vista solo muestra el mensaje si algo falla.
      */
     private void registrar() {
         String nombre = txtNombre.getText().trim();
         String user = txtUsuario.getText().trim();
         String pass = new String(txtClave.getPassword()).trim();
 
-        // Validar que no haya campos vacíos
-        if (nombre.isEmpty() || user.isEmpty() || pass.isEmpty()) {
+        try {
+            session.registrarUsuario(user, pass, nombre);
+        } catch (IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(frame,
-                    "POR FAVOR, COMPLETE TODOS LOS CAMPOS.",
-                    "CAMPO VACIO",
+                    ex.getMessage(),
+                    "REGISTRO INVÁLIDO",
                     JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        // Verificar si el nombre de usuario ya existe en la lista
-        for (Usuario u : VentanaLogin.USUARIOS) {
-            if (u.getUsername().equalsIgnoreCase(user)) {
-                JOptionPane.showMessageDialog(frame,
-                        "EL NOMBRE DEL USUARIO YA EXISTE.",
-                        "USUARIO EXISTENTE",
-                        JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-        }
-
-        // Agregar el nuevo usuario a la lista compartida
-        VentanaLogin.USUARIOS.add(new Usuario(user, pass, nombre));
 
         JOptionPane.showMessageDialog(frame,
                 "¡REGISTRO EXITOSO!",

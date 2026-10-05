@@ -52,6 +52,13 @@ public class SessionController {
     public String getNombreUsuario() {
         return hayUsuario() ? usuarioActual.getNombre() : "";
     }
+    // Cambia el nombre del usuario en sesión. La validación
+    public void cambiarNombre(String nuevoNombre) {
+        if (!hayUsuario()) {
+            throw new IllegalStateException("No hay una sesión activa");
+        }
+        usuarioActual.setNombre(nuevoNombre);
+    }
 
     public void cerrarSesion() {
         usuarioActual = null;

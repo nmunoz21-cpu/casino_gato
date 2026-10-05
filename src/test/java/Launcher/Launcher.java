@@ -1,5 +1,8 @@
 package Launcher;
 
+import Controlador.RuletaController;
+import Controlador.SessionController;
+import Modelo.Ruleta;
 import Vista.VentanaLogin;
 
 /**
@@ -9,7 +12,8 @@ import Vista.VentanaLogin;
 public class Launcher {
 
     public static void main(String[] args) {
-        VentanaLogin ventanaLogin = new VentanaLogin();
-        ventanaLogin.mostrarVentana();
+        SessionController session = new SessionController();
+        RuletaController ruletaController = new RuletaController(new Ruleta());
+        new VentanaLogin(session, ruletaController).mostrarVentana();
     }
 }
