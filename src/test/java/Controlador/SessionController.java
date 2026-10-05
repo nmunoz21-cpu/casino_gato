@@ -27,7 +27,7 @@ public class SessionController {
             throw new IllegalArgumentException("Datos requeridos");
         }
         for (Usuario u : usuarios) {
-            if (u.getUsername().equals(username)) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
                 throw new IllegalArgumentException("El usuario ya existe");
             }
         }
@@ -62,5 +62,8 @@ public class SessionController {
 
     public void cerrarSesion() {
         usuarioActual = null;
+    }
+    public String getUsername() {
+        return hayUsuario() ? usuarioActual.getUsername() : "";
     }
 }
