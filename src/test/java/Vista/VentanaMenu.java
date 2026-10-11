@@ -22,7 +22,7 @@ public class VentanaMenu {
     private JLabel lblNombre;
     private JLabel lblSaldo;
 
-    // Recibe los controladores necesarios para el menú
+    // Recibe los tres controladores del sistema
     public VentanaMenu(SessionController session,
                        RuletaController controlador,
                        ResultadoController resultadoController) {
@@ -60,7 +60,7 @@ public class VentanaMenu {
         actualizarNombre();
         actualizarSaldo();
 
-        // Asigna las acciones de cada botón
+        // Asigna las acciones a los botones
         btnJugar.addActionListener(e -> abrirVentanaRuleta());
         btnHistorial.addActionListener(e -> abrirVentanaHistorial());
         btnPerfil.addActionListener(e -> abrirVentanaPerfil());
@@ -101,6 +101,7 @@ public class VentanaMenu {
 
     // Abre la ventana para realizar apuestas
     private void abrirVentanaRuleta() {
+
         frame.setVisible(false);
 
         VentanaRuleta ventanaRuleta = new VentanaRuleta(
@@ -112,8 +113,9 @@ public class VentanaMenu {
         ventanaRuleta.mostrarVentana();
     }
 
-    // Abre el historial personal mediante ResultadoController
+    // Abre el historial personal del usuario
     private void abrirVentanaHistorial() {
+
         frame.setVisible(false);
 
         VentanaHistorial ventanaHistorial =
@@ -125,8 +127,9 @@ public class VentanaMenu {
         ventanaHistorial.mostrarVentana();
     }
 
-    // Abre la ventana para modificar el perfil
+    // Abre la ventana del perfil
     private void abrirVentanaPerfil() {
+
         frame.setVisible(false);
 
         VentanaPerfil ventanaPerfil = new VentanaPerfil(
@@ -138,19 +141,25 @@ public class VentanaMenu {
         ventanaPerfil.mostrarVentana();
     }
 
-    // Cierra la sesión y regresa al inicio de sesión
+    // Cierra la sesión y regresa al login
     private void cerrarSesion() {
+
         session.cerrarSesion();
         frame.dispose();
 
-        VentanaLogin ventanaLogin =
-                new VentanaLogin(session, controlador);
+        // Comparte los mismos controladores con el login
+        VentanaLogin ventanaLogin = new VentanaLogin(
+                session,
+                controlador,
+                resultadoController
+        );
 
         ventanaLogin.mostrarVentana();
     }
 
-    // Actualiza los datos y muestra nuevamente el menú
+    // Actualiza los datos y muestra el menú
     public void mostrarVentana() {
+
         actualizarNombre();
         actualizarSaldo();
 
