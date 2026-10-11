@@ -1,39 +1,72 @@
+
 package Controlador;
 
 import Modelo.Resultado;
 import Modelo.Ruleta;
 import Modelo.TipoApuesta;
+import Modelo.Usuario;
 
 import java.util.List;
 
-/**
- * Coordina las acciones de la Vista con el Modelo de la ruleta.
- * No contiene reglas de negocio: esas viven en Ruleta.
- */
 public class RuletaController {
 
+    // Modelo encargado de ejecutar las apuestas
     private final Ruleta ruleta;
 
-    // La ruleta se crea afuera (en el Launcher) y se entrega por constructor
+    // Controlador encargado de la sesión activa
+    private final SessionController session;
+
+    // Constructor principal: recibe la ruleta y la sesión compartida
+    public RuletaController(Ruleta ruleta, SessionController session) {
+        if (ruleta == null || session == null) {
+            throw new IllegalArgumentException(
+                    "La ruleta y la sesión son obligatorias"
+            );
+        }
+
+        this.ruleta = ruleta;
+        this.session = session;
+    }
+
+    // Constructor temporal para mantener compatibilidad con Launcher
     public RuletaController(Ruleta ruleta) {
         this.ruleta = ruleta;
+        this.session = null;
     }
 
-    // Pide al Modelo procesar la apuesta. Si es inválida, la excepción
-    // llega hasta la Vista, que decide cómo avisar al usuario.
+    // Ejecuta una apuesta y la guarda en el historial del usuario activo
     public Resultado realizarApuesta(int monto, TipoApuesta tipo) {
-        return ruleta.jugar(monto, tipo);
+
+        // Comprueba que la sesión esté conectada
+        if (session == null || !session.hayUsuario()) {
+            throw new IllegalStateException(
+                    "No hay una sesión activa configurada"
+            );
+        }
+
+        // Obtiene el usuario que está jugando
+        Usuario usuario = session.getUsuarioActual();
+
+        // Realiza la apuesta mediante el modelo Ruleta
+        Resultado resultado = ruleta.jugar(monto, tipo);
+
+        // Registra el resultado en el historial personal
+        usuario.agregarResultado(resultado);
+
+        return resultado;
     }
 
+    // Agrega dinero al saldo de la ruleta
     public void depositar(int monto) {
         ruleta.depositar(monto);
     }
 
+    // Devuelve el saldo disponible
     public int getSaldo() {
         return ruleta.getSaldo();
     }
 
-    // Lista de solo lectura, para VentanaHistorial
+    // Devuelve el historial general de la ruleta
     public List<Resultado> getHistorial() {
         return ruleta.getHistorial();
     }
