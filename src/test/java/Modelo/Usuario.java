@@ -7,19 +7,24 @@ import java.util.List;
 
 public class Usuario {
 
-    // Datos de la cuenta del usuario
+    // Datos de la cuenta
     private final String username;
     private final String clave;
     private String nombre;
 
-    // Guarda los resultados de las apuestas del usuario
+    // Saldo individual del usuario
+    private int saldo;
+
+    // Historial individual de apuestas
     private final List<Resultado> historial;
 
-    // Crea un usuario con sus datos y un historial vacío
+    // Inicializa el usuario con saldo e historial propios
     public Usuario(String username, String clave, String nombre) {
         this.username = username;
         this.clave = clave;
         setNombre(nombre);
+
+        this.saldo = 1000;
         this.historial = new ArrayList<>();
     }
 
@@ -33,7 +38,7 @@ public class Usuario {
         return nombre;
     }
 
-    // Cambia el nombre y verifica que no esté vacío
+    // Modifica el nombre validando que no esté vacío
     public void setNombre(String nuevoNombre) {
         if (nuevoNombre == null || nuevoNombre.isBlank()) {
             throw new IllegalArgumentException(
@@ -44,13 +49,35 @@ public class Usuario {
         this.nombre = nuevoNombre.trim();
     }
 
-    // Comprueba si el usuario y la contraseña coinciden
+    // Valida las credenciales del usuario
     public boolean validarCredenciales(String username, String clave) {
         return this.username.equalsIgnoreCase(username)
                 && this.clave.equals(clave);
     }
 
-    // Agrega una nueva jugada al historial del usuario
+    // Devuelve el saldo individual
+    public int getSaldo() {
+        return saldo;
+    }
+
+    // Permite recargar el saldo del usuario
+    public void depositar(int monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException(
+                    "El monto debe ser mayor a cero"
+            );
+        }
+
+        if (monto > Integer.MAX_VALUE - saldo) {
+            throw new IllegalArgumentException(
+                    "El monto supera el saldo permitido"
+            );
+        }
+
+        saldo += monto;
+    }
+
+    // Guarda una apuesta y actualiza el saldo del usuario
     public void agregarResultado(Resultado resultado) {
         if (resultado == null) {
             throw new IllegalArgumentException(
@@ -58,10 +85,17 @@ public class Usuario {
             );
         }
 
+        if (resultado.getSaldo() < 0) {
+            throw new IllegalArgumentException(
+                    "El saldo no puede ser negativo"
+            );
+        }
+
         historial.add(resultado);
+        saldo = resultado.getSaldo();
     }
 
-    // Devuelve el historial sin permitir modificaciones externas
+    // Devuelve el historial sin permitir cambios externos
     public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
     }
