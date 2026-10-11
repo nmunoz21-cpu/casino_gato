@@ -16,8 +16,9 @@ public class RuletaController {
     // Controlador encargado de la sesión activa
     private final SessionController session;
 
-    // Constructor principal: recibe la ruleta y la sesión compartida
+    // Recibe la ruleta y la sesión compartida
     public RuletaController(Ruleta ruleta, SessionController session) {
+
         if (ruleta == null || session == null) {
             throw new IllegalArgumentException(
                     "La ruleta y la sesión son obligatorias"
@@ -28,46 +29,46 @@ public class RuletaController {
         this.session = session;
     }
 
-    // Constructor temporal para mantener compatibilidad con Launcher
-    public RuletaController(Ruleta ruleta) {
-        this.ruleta = ruleta;
-        this.session = null;
-    }
-
-    // Ejecuta una apuesta y la guarda en el historial del usuario activo
+    // Realiza una apuesta utilizando el saldo del usuario activo
     public Resultado realizarApuesta(int monto, TipoApuesta tipo) {
 
-        // Comprueba que la sesión esté conectada
-        if (session == null || !session.hayUsuario()) {
-            throw new IllegalStateException(
-                    "No hay una sesión activa configurada"
-            );
-        }
-
-        // Obtiene el usuario que está jugando
+        // Obtiene el usuario que inició sesión
         Usuario usuario = session.getUsuarioActual();
 
-        // Realiza la apuesta mediante el modelo Ruleta
-        Resultado resultado = ruleta.jugar(monto, tipo);
+        // Ejecuta la apuesta con el saldo individual
+        Resultado resultado = ruleta.jugar(
+                monto,
+                tipo,
+                usuario.getSaldo()
+        );
 
-        // Registra el resultado en el historial personal
+        // Guarda la jugada y actualiza el saldo del usuario
         usuario.agregarResultado(resultado);
 
         return resultado;
     }
 
-    // Agrega dinero al saldo de la ruleta
+    // Recarga el saldo del usuario activo
     public void depositar(int monto) {
-        ruleta.depositar(monto);
+
+        Usuario usuario = session.getUsuarioActual();
+
+        usuario.depositar(monto);
     }
 
-    // Devuelve el saldo disponible
+    // Devuelve el saldo del usuario activo
     public int getSaldo() {
-        return ruleta.getSaldo();
+
+        Usuario usuario = session.getUsuarioActual();
+
+        return usuario.getSaldo();
     }
 
-    // Devuelve el historial general de la ruleta
+    // Devuelve el historial individual del usuario activo
     public List<Resultado> getHistorial() {
-        return ruleta.getHistorial();
+
+        Usuario usuario = session.getUsuarioActual();
+
+        return usuario.getHistorial();
     }
 }
