@@ -1,6 +1,7 @@
 
 package Launcher;
 
+import Controlador.ResultadoController;
 import Controlador.RuletaController;
 import Controlador.SessionController;
 import Modelo.Ruleta;
@@ -15,19 +16,26 @@ public class Launcher {
 
         SwingUtilities.invokeLater(() -> {
 
-            // Crea el controlador de sesiones compartido
+            // Crea la sesión compartida
             SessionController session = new SessionController();
 
-            // Crea el modelo encargado de la ruleta
+            // Crea el modelo de la ruleta
             Ruleta ruleta = new Ruleta();
 
-            // Conecta la ruleta con la sesión del usuario
+            // Conecta la ruleta con la sesión
             RuletaController ruletaController =
                     new RuletaController(ruleta, session);
 
-            // Abre la ventana inicial del sistema
-            VentanaLogin ventanaLogin =
-                    new VentanaLogin(session, ruletaController);
+            // Permite consultar el historial del usuario activo
+            ResultadoController resultadoController =
+                    new ResultadoController(session);
+
+            // Abre el login con los tres controladores
+            VentanaLogin ventanaLogin = new VentanaLogin(
+                    session,
+                    ruletaController,
+                    resultadoController
+            );
 
             ventanaLogin.mostrarVentana();
         });
