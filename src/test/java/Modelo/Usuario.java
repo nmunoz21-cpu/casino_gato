@@ -1,36 +1,27 @@
 package Modelo;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class Usuario {
-    private String username;
-    private String password;
-    private String nombre;
+    private final List<Resultado> historial;
 
-    public Usuario(String username, String password, String nombre) {
-        this.username = username;
-        this.password = password;
-        this.nombre = nombre;
-    }
-    // Verifica si las credenciales ingresadas pertenecen al usuario
-    public boolean validarCredenciales(String u, String p) {
-
-        return this.username.equals(u) && this.password.equals(p);
+    // Constructor: crea al usuario con su historial vacío.
+    // Sin inicializar la lista, el primer add daría NullPointerException.
+    public Usuario(String nombre, String clave) {
+        this.historial = new ArrayList<>();
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-    //Devuelve el nombre de usuario con el que inicia sesión.
-    public String getUsername() {
-        return username;
+    // Agrega un resultado al final del historial del usuario.
+    // Es la única forma de modificar el historial desde fuera.
+    public void agregarResultado(Resultado r) {
+        historial.add(r);
     }
 
-    // Actualiza el nombre del usuario. No acepta valores nulos ni vacíos
-    // para que el objeto nunca quede con un nombre inválido.
-    public void setNombre(String nombre){
-        if (nombre != null && !nombre.isBlank()){
-            this.nombre= nombre;
-        }else{
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
+    // Devuelve el historial en modo solo lectura.
+    // Quien lo consulte puede recorrerlo, pero no agregar ni borrar.
+    public List<Resultado> getHistorial() {
+        return Collections.unmodifiableList(historial);
     }
 }
