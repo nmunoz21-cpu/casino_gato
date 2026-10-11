@@ -20,7 +20,7 @@ public class Ruleta {
             19, 21, 23, 25, 27, 30, 32, 34, 36
     );
 
-    // Inicializa la ruleta y su historial
+    // Inicializa la ruleta con un historial vacío
     public Ruleta() {
         this.random = new Random();
         this.historial = new ArrayList<>();
@@ -31,12 +31,12 @@ public class Ruleta {
         return random.nextInt(37);
     }
 
-    // Comprueba si el número pertenece a los rojos
+    // Comprueba si el número obtenido es rojo
     private boolean esRojo(int numero) {
         return NUMEROS_ROJOS.contains(numero);
     }
 
-    // Verifica si la apuesta fue acertada
+    // Verifica si la apuesta coincide con el número obtenido
     private boolean verificarApuesta(int numero, TipoApuesta tipo) {
 
         // El cero no gana apuestas de color ni paridad
@@ -52,11 +52,11 @@ public class Ruleta {
         };
     }
 
-    // Ejecuta una apuesta utilizando el saldo del usuario
+    // Realiza una apuesta utilizando el saldo del usuario
     public Resultado jugar(int monto, TipoApuesta tipo,
                            int saldoUsuario) {
 
-        // Comprueba que el tipo de apuesta sea válido
+        // Comprueba que se haya seleccionado una apuesta
         if (tipo == null) {
             throw new IllegalArgumentException(
                     "Debes seleccionar un tipo de apuesta"
@@ -66,11 +66,11 @@ public class Ruleta {
         // Valida que el monto sea positivo
         if (monto <= 0) {
             throw new IllegalArgumentException(
-                    "El monto debe ser mayor a cero"
+                    "La apuesta debe ser mayor a cero"
             );
         }
 
-        // Comprueba que el usuario tenga saldo suficiente
+        // Comprueba que exista saldo suficiente
         if (saldoUsuario < 0 || monto > saldoUsuario) {
             throw new IllegalArgumentException(
                     "Saldo insuficiente para apostar"
@@ -84,12 +84,14 @@ public class Ruleta {
             );
         }
 
-        // Genera el resultado de la ruleta
+        // Genera el número de la ronda
         int numero = girar();
+
+        // Determina el color y comprueba la apuesta
         boolean rojo = esRojo(numero);
         boolean gano = verificarApuesta(numero, tipo);
 
-        // Calcula el nuevo saldo del usuario
+        // Calcula el saldo resultante del usuario
         int nuevoSaldo;
 
         if (gano) {
@@ -98,7 +100,7 @@ public class Ruleta {
             nuevoSaldo = saldoUsuario - monto;
         }
 
-        // Crea el resultado de la ronda
+        // Crea un resultado con los datos de la ronda
         Resultado resultado = new Resultado(
                 numero,
                 rojo,
@@ -108,13 +110,13 @@ public class Ruleta {
                 nuevoSaldo
         );
 
-        // Registra el resultado generado
+        // Almacena el resultado generado
         historial.add(resultado);
 
         return resultado;
     }
 
-    // Devuelve el historial general de la ruleta
+    // Devuelve el historial sin permitir modificaciones externas
     public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
     }
