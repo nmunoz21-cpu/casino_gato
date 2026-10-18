@@ -1,4 +1,6 @@
 package Modelo;
+import java.util.Map;
+import java.util.EnumMap;
 
 public class Estadisticas {
 	private final Usuario usuario;
@@ -54,15 +56,32 @@ public class Estadisticas {
 		return rachaMaxima;
 	}
 
+	// Calcula el tipo de apuesta más utilizado por el usuario
 	public TipoApuesta calcularTipoMasJugado() {
-		// TODO - implement Estadisticas.calcularTipoMasJugado
-		throw new UnsupportedOperationException();
+
+		Map<TipoApuesta, Integer> conteo = new EnumMap<>(TipoApuesta.class);
+
+		for (Resultado resultado : usuario.getHistorial()) {
+
+			TipoApuesta tipo = resultado.getTipoApuesta();
+
+			conteo.put(tipo, conteo.getOrDefault(tipo, 0) + 1);
+		}
+
+		TipoApuesta masJugado = null;
+		int mayorCantidad = 0;
+
+		for (TipoApuesta tipo : TipoApuesta.values()) {
+
+			int cantidad = conteo.getOrDefault(tipo, 0);
+
+			if (cantidad > mayorCantidad) {
+				mayorCantidad = cantidad;
+				masJugado = tipo;
+			}
+		}
+
+		return masJugado;
 	}
-
-	/**
-	 * 
-	 * @param usuario
-	 */
-
 
 }
