@@ -5,7 +5,7 @@ public class Estadisticas {
 
 	public int calcularTotalJugadas() {
 		// TODO - implement Estadisticas.calcularTotalJugadas
-		throw new UnsupportedOperationException();
+		return usuario.getHistorial().size();
 	}
 
 	public int calcularVictorias() {
@@ -34,7 +34,7 @@ public class Estadisticas {
 	 */
 	public Estadisticas(Usuario usuario) {
 		// TODO - implement Estadisticas.Estadisticas
-		throw new UnsupportedOperationException();
+		this.usuario = usuario;
 	}
 
 }
