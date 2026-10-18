@@ -2,6 +2,10 @@ package Modelo;
 
 public class Estadisticas {
 	private final Usuario usuario;
+	//constructor
+	public Estadisticas(Usuario usuario) {
+		this.usuario = usuario;
+	}
 
 	public int calcularTotalJugadas() {
 		// TODO - implement Estadisticas.calcularTotalJugadas
@@ -27,9 +31,27 @@ public class Estadisticas {
 		return (calcularVictorias())* 100.0/ Totaljugadas;
 	}
 
+	// Calcula la mayor racha de victorias consecutivas
 	public int calcularRachaMaxima() {
-		// TODO - implement Estadisticas.calcularRachaMaxima
-		throw new UnsupportedOperationException();
+
+		int rachaActual = 0;
+		int rachaMaxima = 0;
+
+		for (Resultado resultado : usuario.getHistorial()) {
+
+			if (resultado.isGano()) {
+				rachaActual++;
+
+				if (rachaActual > rachaMaxima) {
+					rachaMaxima = rachaActual;
+				}
+
+			} else {
+				rachaActual = 0;
+			}
+		}
+
+		return rachaMaxima;
 	}
 
 	public TipoApuesta calcularTipoMasJugado() {
@@ -41,9 +63,6 @@ public class Estadisticas {
 	 * 
 	 * @param usuario
 	 */
-	public Estadisticas(Usuario usuario) {
-		// TODO - implement Estadisticas.Estadisticas
-		this.usuario = usuario;
-	}
+
 
 }
