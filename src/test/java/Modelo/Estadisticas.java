@@ -7,10 +7,16 @@ public class Estadisticas {
 		// TODO - implement Estadisticas.calcularTotalJugadas
 		return usuario.getHistorial().size();
 	}
-
+	// Calcula la cantidad de apuestas ganadas por el usuario
 	public int calcularVictorias() {
-		// TODO - implement Estadisticas.calcularVictorias
-		throw new UnsupportedOperationException();
+		int victorias=0;
+		for (Resultado resultado: usuario.getHistorial()){
+			if(resultado.isGano()){
+
+				victorias++;
+			}
+		}
+		return victorias;
 	}
 
 	public double calcularPorcentajeVictorias() {
