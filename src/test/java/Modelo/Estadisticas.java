@@ -18,10 +18,13 @@ public class Estadisticas {
 		}
 		return victorias;
 	}
-
+     // calcula el porcentaje de victoria del usuario
 	public double calcularPorcentajeVictorias() {
-		// TODO - implement Estadisticas.calcularPorcentajeVictorias
-		throw new UnsupportedOperationException();
+		int Totaljugadas =calcularTotalJugadas();
+		if (Totaljugadas==0){
+			return 0.0;
+		}
+		return (calcularVictorias())* 100.0/ Totaljugadas;
 	}
 
 	public int calcularRachaMaxima() {
