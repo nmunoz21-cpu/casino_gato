@@ -17,6 +17,7 @@ public class Usuario {
 
     // Historial individual de apuestas
     private final List<Resultado> historial;
+    private final Estadisticas estadisticas;
 
     // Inicializa el usuario con saldo e historial propios
     public Usuario(String username, String clave, String nombre) {
@@ -26,6 +27,7 @@ public class Usuario {
 
         this.saldo = 1000;
         this.historial = new ArrayList<>();
+        this.estadisticas = new Estadisticas(this);
     }
 
     // Devuelve el nombre de usuario
@@ -98,5 +100,10 @@ public class Usuario {
     // Devuelve el historial sin permitir cambios externos
     public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
+    }
+
+    // Devuelve las estadísticas propias del usuario
+    public Estadisticas getEstadisticas() {
+        return estadisticas;
     }
 }
