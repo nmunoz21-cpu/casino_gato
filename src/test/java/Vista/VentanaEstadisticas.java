@@ -2,7 +2,6 @@
 package Vista;
 
 import Controlador.EstadisticasController;
-import Modelo.TipoApuesta;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,26 +9,32 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Locale;
 
+/**
+ * Ventana que muestra las estadisticas
+ * individuales del usuario.
+ */
 public class VentanaEstadisticas {
 
-    // Controlador encargado de consultar las estadísticas
+    // Controlador de estadisticas
     private final EstadisticasController estadisticasController;
 
-    // Acción que permite regresar al menú principal
+    // Accion para regresar al menu
     private final Runnable alVolver;
 
     // Ventana principal
     private final JFrame frame =
             new JFrame("ESTADISTICAS - Casino Black Cat");
 
-    // Etiquetas que muestran los indicadores
+    // Etiquetas de los indicadores
     private JLabel lblTotalJugadas;
     private JLabel lblVictorias;
     private JLabel lblPorcentaje;
     private JLabel lblRachaMaxima;
     private JLabel lblTipoMasJugado;
 
-    // Constructor de la ventana
+    /**
+     * Constructor de la ventana.
+     */
     public VentanaEstadisticas(
             EstadisticasController estadisticasController,
             Runnable alVolver) {
@@ -40,23 +45,31 @@ public class VentanaEstadisticas {
             );
         }
 
-        this.estadisticasController = estadisticasController;
+        this.estadisticasController =
+                estadisticasController;
+
         this.alVolver = alVolver;
 
         configurarVentana();
         construirInterfaz();
     }
 
-    // Configura el tamaño y el cierre de la ventana
+    /**
+     * Configura las propiedades de la ventana.
+     */
     private void configurarVentana() {
 
         frame.setSize(480, 350);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        // Al cerrar la ventana, regresa al menú
+        frame.setDefaultCloseOperation(
+                JFrame.DISPOSE_ON_CLOSE
+        );
+
         frame.addWindowListener(new WindowAdapter() {
+
             @Override
             public void windowClosed(WindowEvent e) {
+
                 if (alVolver != null) {
                     alVolver.run();
                 }
@@ -64,7 +77,9 @@ public class VentanaEstadisticas {
         });
     }
 
-    // Construye los componentes gráficos
+    /**
+     * Construye los componentes graficos.
+     */
     private void construirInterfaz() {
 
         JLabel titulo = new JLabel(
@@ -73,7 +88,9 @@ public class VentanaEstadisticas {
         );
 
         titulo.setFont(
-                titulo.getFont().deriveFont(Font.BOLD, 18f)
+                titulo.getFont().deriveFont(
+                        Font.BOLD, 18f
+                )
         );
 
         JPanel panel = new JPanel(
@@ -81,7 +98,9 @@ public class VentanaEstadisticas {
         );
 
         panel.setBorder(
-                BorderFactory.createEmptyBorder(20, 25, 20, 25)
+                BorderFactory.createEmptyBorder(
+                        20, 25, 20, 25
+                )
         );
 
         // Inicializa las etiquetas
@@ -104,13 +123,17 @@ public class VentanaEstadisticas {
         panel.add(new JLabel("Racha máxima:"));
         panel.add(lblRachaMaxima);
 
-        panel.add(new JLabel("Tipo de apuesta más jugado:"));
+        panel.add(new JLabel(
+                "Tipo de apuesta más jugado:"
+        ));
         panel.add(lblTipoMasJugado);
 
-        // Botón para regresar al menú
+        // Boton para regresar al menu
         JButton btnVolver = new JButton("Volver");
 
-        btnVolver.addActionListener(e -> frame.dispose());
+        btnVolver.addActionListener(
+                e -> frame.dispose()
+        );
 
         JPanel pie = new JPanel(
                 new FlowLayout(FlowLayout.RIGHT)
@@ -118,7 +141,7 @@ public class VentanaEstadisticas {
 
         pie.add(btnVolver);
 
-        // Distribuye los componentes
+        // Distribucion de componentes
         frame.setLayout(new BorderLayout());
 
         frame.add(titulo, BorderLayout.NORTH);
@@ -126,7 +149,10 @@ public class VentanaEstadisticas {
         frame.add(pie, BorderLayout.SOUTH);
     }
 
-    // Actualiza los indicadores utilizando el controlador
+    /**
+     * Solicita las estadisticas al controlador
+     * y actualiza los indicadores.
+     */
     private void actualizarEstadisticas() {
 
         lblTotalJugadas.setText(
@@ -145,7 +171,8 @@ public class VentanaEstadisticas {
                 String.format(
                         Locale.forLanguageTag("es-CL"),
                         "%.2f %%",
-                        estadisticasController.obtenerPorcentajeVictorias()
+                        estadisticasController
+                                .obtenerPorcentajeVictorias()
                 )
         );
 
@@ -155,15 +182,19 @@ public class VentanaEstadisticas {
                 )
         );
 
-        TipoApuesta tipo =
+        // Obtiene el tipo de apuesta mas frecuente
+        String tipo =
                 estadisticasController.obtenerTipoMasJugado();
 
         lblTipoMasJugado.setText(
-                tipo == null ? "Sin jugadas" : tipo.name()
+                tipo == null ? "Sin jugadas" : tipo
         );
     }
 
-    // Muestra la ventana centrada en pantalla
+    /**
+     * Actualiza los indicadores y muestra
+     * la ventana centrada en pantalla.
+     */
     public void mostrarVentana() {
 
         actualizarEstadisticas();

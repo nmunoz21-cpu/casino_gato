@@ -2,27 +2,36 @@
 package Controlador;
 
 import Modelo.Estadisticas;
-import Modelo.TipoApuesta;
 import Modelo.Usuario;
 
+/**
+ * Controlador encargado de comunicar
+ * la vista con las estadisticas del usuario.
+ */
 public class EstadisticasController {
 
-    // Controlador que administra la sesión activa
+    // Controlador de la sesion activa
     private final SessionController session;
 
-    // Recibe la misma sesión de los otros controladores
+    /**
+     * Constructor que recibe la sesion
+     * compartida del sistema.
+     */
     public EstadisticasController(SessionController session) {
 
         if (session == null) {
             throw new IllegalArgumentException(
-                    "La sesión es obligatoria"
+                    "El controlador de sesion es obligatorio"
             );
         }
 
         this.session = session;
     }
 
-    // Obtiene las estadísticas del usuario activo
+    /**
+     * Obtiene las estadisticas del usuario
+     * que inicio sesion.
+     */
     private Estadisticas obtenerEstadisticas() {
 
         Usuario usuario = session.getUsuarioActual();
@@ -30,28 +39,39 @@ public class EstadisticasController {
         return usuario.getEstadisticas();
     }
 
-    // Devuelve la cantidad total de jugadas
+    /**
+     * Devuelve el total de jugadas.
+     */
     public int obtenerTotalJugadas() {
         return obtenerEstadisticas().calcularTotalJugadas();
     }
 
-    // Devuelve la cantidad de victorias
+    /**
+     * Devuelve la cantidad de victorias.
+     */
     public int obtenerVictorias() {
         return obtenerEstadisticas().calcularVictorias();
     }
 
-    // Devuelve el porcentaje de victorias
+    /**
+     * Devuelve el porcentaje de victorias.
+     */
     public double obtenerPorcentajeVictorias() {
-        return obtenerEstadisticas().calcularPorcentajeVictorias();
+        return obtenerEstadisticas()
+                .calcularPorcentajeVictorias();
     }
 
-    // Devuelve la mayor racha de victorias
+    /**
+     * Devuelve la racha maxima de victorias.
+     */
     public int obtenerRachaMaxima() {
         return obtenerEstadisticas().calcularRachaMaxima();
     }
 
-    // Devuelve el tipo de apuesta más frecuente
-    public TipoApuesta obtenerTipoMasJugado() {
+    /**
+     * Devuelve el tipo de apuesta mas utilizado.
+     */
+    public String obtenerTipoMasJugado() {
         return obtenerEstadisticas().calcularTipoMasJugado();
     }
 }

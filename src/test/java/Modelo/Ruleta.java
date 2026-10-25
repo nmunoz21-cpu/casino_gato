@@ -6,117 +6,123 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Ejecuta una ronda de ruleta sin conocer
+ * los tipos concretos de apuesta.
+ */
 public class Ruleta {
 
-    // Generador de números aleatorios
+    // Generador de numeros aleatorios
     private final Random random;
 
-    // Almacena los resultados generados por la ruleta
+    // Historial de resultados de la ruleta
     private final List<Resultado> historial;
 
-    // Números rojos de la ruleta europea
+    // Numeros rojos de la ruleta europea
     private static final List<Integer> NUMEROS_ROJOS = List.of(
             1, 3, 5, 7, 9, 12, 14, 16, 18,
             19, 21, 23, 25, 27, 30, 32, 34, 36
     );
 
-    // Inicializa la ruleta con un historial vacío
+    /**
+     * Constructor de la ruleta.
+     * Inicializa el generador y el historial.
+     */
     public Ruleta() {
         this.random = new Random();
         this.historial = new ArrayList<>();
     }
 
-    // Genera un número aleatorio entre 0 y 36
+    /**
+     * Genera un numero aleatorio entre 0 y 36.
+     */
     private int girar() {
         return random.nextInt(37);
     }
 
-    // Comprueba si el número obtenido es rojo
+    /**
+     * Determina si el numero pertenece
+     * a los numeros rojos de la ruleta.
+     */
     private boolean esRojo(int numero) {
         return NUMEROS_ROJOS.contains(numero);
     }
 
-    // Verifica si la apuesta coincide con el número obtenido
-    private boolean verificarApuesta(int numero, TipoApuesta tipo) {
-
-        // El cero no gana apuestas de color ni paridad
-        if (numero == 0) {
-            return false;
-        }
-
-        return switch (tipo) {
-            case ROJO -> esRojo(numero);
-            case NEGRO -> !esRojo(numero);
-            case PAR -> numero % 2 == 0;
-            case IMPAR -> numero % 2 != 0;
-        };
-    }
-
-    // Realiza una apuesta utilizando el saldo del usuario
-    public Resultado jugar(int monto, TipoApuesta tipo,
+    /**
+     * Ejecuta una apuesta utilizando polimorfismo.
+     *
+     * @param apuesta objeto de cualquier subclase
+     *                 de ApuestaBase
+     * @param saldoUsuario saldo actual del jugador
+     * @return resultado de la ronda
+     */
+    public Resultado jugar(ApuestaBase apuesta,
                            int saldoUsuario) {
 
-        // Comprueba que se haya seleccionado una apuesta
-        if (tipo == null) {
+        // Verifica que exista una apuesta
+        if (apuesta == null) {
             throw new IllegalArgumentException(
-                    "Debes seleccionar un tipo de apuesta"
+                    "Debes seleccionar una apuesta"
             );
         }
 
-        // Valida que el monto sea positivo
-        if (monto <= 0) {
-            throw new IllegalArgumentException(
-                    "La apuesta debe ser mayor a cero"
-            );
-        }
+        // Obtiene el monto desde la clase base
+        int monto = apuesta.getMonto();
 
-        // Comprueba que exista saldo suficiente
+        // Verifica que el saldo sea suficiente
         if (saldoUsuario < 0 || monto > saldoUsuario) {
             throw new IllegalArgumentException(
                     "Saldo insuficiente para apostar"
             );
         }
 
-        // Evita superar el límite de saldo permitido
-        if ((long) saldoUsuario + monto > Integer.MAX_VALUE) {
+        // Evita superar el limite de saldo
+        if ((long) saldoUsuario + monto >
+                Integer.MAX_VALUE) {
+
             throw new IllegalArgumentException(
                     "La posible ganancia supera el saldo permitido"
             );
         }
 
-        // Genera el número de la ronda
+        // Genera un unico numero para la ronda
         int numero = girar();
 
-        // Determina el color y comprueba la apuesta
+        // Determina el color del numero
         boolean rojo = esRojo(numero);
-        boolean gano = verificarApuesta(numero, tipo);
 
-        // Calcula el saldo resultante del usuario
-        int nuevoSaldo;
+        String color = numero == 0
+                ? "Verde"
+                : (rojo ? "Rojo" : "Negro");
 
-        if (gano) {
-            nuevoSaldo = saldoUsuario + monto;
-        } else {
-            nuevoSaldo = saldoUsuario - monto;
-        }
+        // POLIMORFISMO:
+        // Cada subclase determina si la apuesta acierta
+        boolean gano = apuesta.acierta(numero, color);
 
-        // Crea un resultado con los datos de la ronda
+        // Calcula el nuevo saldo del usuario
+        int nuevoSaldo = gano
+                ? saldoUsuario + monto
+                : saldoUsuario - monto;
+
+        // Crea el resultado de la jugada
         Resultado resultado = new Resultado(
                 numero,
                 rojo,
-                tipo,
-                monto,
+                apuesta,
                 gano,
                 nuevoSaldo
         );
 
-        // Almacena el resultado generado
+        // Registra el resultado en el historial
         historial.add(resultado);
 
         return resultado;
     }
 
-    // Devuelve el historial sin permitir modificaciones externas
+    /**
+     * Devuelve el historial sin permitir
+     * modificaciones externas.
+     */
     public List<Resultado> getHistorial() {
         return Collections.unmodifiableList(historial);
     }

@@ -1,58 +1,67 @@
 
 package Modelo;
 
-// Representa el resultado de una ronda de ruleta
+/**
+ * Conserva los datos de una ronda de la ruleta.
+ */
 public class Resultado {
 
-    // Datos obtenidos después de una apuesta
     private final int numero;
     private final boolean rojo;
-    private final TipoApuesta tipoApuesta;
-    private final int monto;
+    private final ApuestaBase apuesta;
     private final boolean gano;
     private final int saldo;
 
-    // Crea un resultado con los datos de la ronda
+    /**
+     * Constructor que registra el resultado de una jugada.
+     */
     public Resultado(int numero, boolean rojo,
-                     TipoApuesta tipoApuesta, int monto,
+                     ApuestaBase apuesta,
                      boolean gano, int saldo) {
+
+        if (apuesta == null) {
+            throw new IllegalArgumentException(
+                    "La apuesta es obligatoria"
+            );
+        }
+
         this.numero = numero;
         this.rojo = rojo;
-        this.tipoApuesta = tipoApuesta;
-        this.monto = monto;
+        this.apuesta = apuesta;
         this.gano = gano;
         this.saldo = saldo;
     }
 
-    // Devuelve el número obtenido en la ruleta
+    // Devuelve el numero obtenido en la ruleta
     public int getNumero() {
         return numero;
     }
 
-    // Indica si el número obtenido es rojo
+    // Indica si el numero obtenido es rojo
     public boolean isRojo() {
         return rojo;
     }
 
-    // Devuelve el color del número obtenido
+    // Devuelve el color del numero obtenido
     public String getColor() {
         if (numero == 0) {
             return "Verde";
         }
+
         return rojo ? "Rojo" : "Negro";
     }
 
-    // Devuelve el tipo de apuesta realizada
-    public TipoApuesta getTipoApuesta() {
-        return tipoApuesta;
+    // Devuelve el objeto de apuesta realizado
+    public ApuestaBase getApuesta() {
+        return apuesta;
     }
 
     // Devuelve el monto apostado
     public int getMonto() {
-        return monto;
+        return apuesta.getMonto();
     }
 
-    // Indica si el jugador ganó la apuesta
+    // Indica si el jugador gano
     public boolean isGano() {
         return gano;
     }
@@ -62,7 +71,7 @@ public class Resultado {
         return gano;
     }
 
-    // Devuelve el saldo después de la ronda
+    // Devuelve el saldo despues de la ronda
     public int getSaldo() {
         return saldo;
     }

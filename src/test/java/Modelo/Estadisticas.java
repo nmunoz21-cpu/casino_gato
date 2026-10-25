@@ -1,39 +1,74 @@
-package Modelo;
-import java.util.Map;
-import java.util.EnumMap;
 
+package Modelo;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+
+/**
+ * Calcula las estadisticas individuales del usuario
+ * utilizando su historial de resultados.
+ */
 public class Estadisticas {
+
+	// Usuario al que pertenecen las estadisticas
 	private final Usuario usuario;
-	//constructor
+
+	/**
+	 * Constructor que vincula las estadisticas
+	 * con un usuario.
+	 */
 	public Estadisticas(Usuario usuario) {
-		this.usuario = usuario;
+		this.usuario = Objects.requireNonNull(
+				usuario,
+				"El usuario es obligatorio"
+		);
 	}
 
+	/**
+	 * Calcula la cantidad total de jugadas.
+	 */
 	public int calcularTotalJugadas() {
-		// TODO - implement Estadisticas.calcularTotalJugadas
 		return usuario.getHistorial().size();
 	}
-	// Calcula la cantidad de apuestas ganadas por el usuario
-	public int calcularVictorias() {
-		int victorias=0;
-		for (Resultado resultado: usuario.getHistorial()){
-			if(resultado.isGano()){
 
+	/**
+	 * Calcula la cantidad de victorias.
+	 */
+	public int calcularVictorias() {
+
+		int victorias = 0;
+
+		for (Resultado resultado : usuario.getHistorial()) {
+
+			if (resultado.isGano()) {
 				victorias++;
 			}
 		}
+
 		return victorias;
 	}
-     // calcula el porcentaje de victoria del usuario
+
+	/**
+	 * Calcula el porcentaje de victorias.
+	 * Evita dividir entre cero.
+	 */
 	public double calcularPorcentajeVictorias() {
-		int Totaljugadas =calcularTotalJugadas();
-		if (Totaljugadas==0){
+
+		int totalJugadas = calcularTotalJugadas();
+
+		if (totalJugadas == 0) {
 			return 0.0;
 		}
-		return (calcularVictorias())* 100.0/ Totaljugadas;
+
+		return calcularVictorias() * 100.0
+				/ totalJugadas;
 	}
 
-	// Calcula la mayor racha de victorias consecutivas
+	/**
+	 * Calcula la mayor cantidad de
+	 * victorias consecutivas.
+	 */
 	public int calcularRachaMaxima() {
 
 		int rachaActual = 0;
@@ -42,6 +77,7 @@ public class Estadisticas {
 		for (Resultado resultado : usuario.getHistorial()) {
 
 			if (resultado.isGano()) {
+
 				rachaActual++;
 
 				if (rachaActual > rachaMaxima) {
@@ -56,32 +92,48 @@ public class Estadisticas {
 		return rachaMaxima;
 	}
 
-	// Calcula el tipo de apuesta más utilizado por el usuario
-	public TipoApuesta calcularTipoMasJugado() {
+	/**
+	 * Determina el tipo de apuesta mas utilizado.
+	 *
+	 * Utiliza la etiqueta de cada apuesta
+	 * para no depender de un enum.
+	 *
+	 * Si existe empate, devuelve el primero
+	 * registrado en el historial.
+	 *
+	 * Si no existen jugadas, devuelve null.
+	 */
+	public String calcularTipoMasJugado() {
 
-		Map<TipoApuesta, Integer> conteo = new EnumMap<>(TipoApuesta.class);
+		Map<String, Integer> conteo =
+				new LinkedHashMap<>();
 
+		// Cuenta las veces que aparece cada apuesta
 		for (Resultado resultado : usuario.getHistorial()) {
 
-			TipoApuesta tipo = resultado.getTipoApuesta();
+			String etiqueta =
+					resultado.getApuesta().getEtiqueta();
 
-			conteo.put(tipo, conteo.getOrDefault(tipo, 0) + 1);
+			conteo.put(
+					etiqueta,
+					conteo.getOrDefault(etiqueta, 0) + 1
+			);
 		}
 
-		TipoApuesta masJugado = null;
+		String masJugado = null;
 		int mayorCantidad = 0;
 
-		for (TipoApuesta tipo : TipoApuesta.values()) {
+		// Busca la apuesta con mayor frecuencia
+		for (Map.Entry<String, Integer> entrada
+				: conteo.entrySet()) {
 
-			int cantidad = conteo.getOrDefault(tipo, 0);
+			if (entrada.getValue() > mayorCantidad) {
 
-			if (cantidad > mayorCantidad) {
-				mayorCantidad = cantidad;
-				masJugado = tipo;
+				mayorCantidad = entrada.getValue();
+				masJugado = entrada.getKey();
 			}
 		}
 
 		return masJugado;
 	}
-
 }

@@ -1,27 +1,37 @@
 
 package Controlador;
 
+import Modelo.ApuestaBase;
 import Modelo.Resultado;
 import Modelo.Ruleta;
-import Modelo.TipoApuesta;
 import Modelo.Usuario;
 
 import java.util.List;
 
+/**
+ * Controlador encargado de coordinar
+ * las apuestas y la sesion del usuario.
+ */
 public class RuletaController {
 
-    // Modelo encargado de ejecutar las apuestas
+    // Modelo de la ruleta
     private final Ruleta ruleta;
 
-    // Controlador encargado de la sesión activa
+    // Controlador de sesion compartido
     private final SessionController session;
 
-    // Recibe la ruleta y la sesión compartida
-    public RuletaController(Ruleta ruleta, SessionController session) {
+    /**
+     * Constructor del controlador.
+     *
+     * @param ruleta modelo que ejecuta las apuestas
+     * @param session controlador de sesion
+     */
+    public RuletaController(Ruleta ruleta,
+                            SessionController session) {
 
         if (ruleta == null || session == null) {
             throw new IllegalArgumentException(
-                    "La ruleta y la sesión son obligatorias"
+                    "La ruleta y la sesion son obligatorias"
             );
         }
 
@@ -29,46 +39,49 @@ public class RuletaController {
         this.session = session;
     }
 
-    // Realiza una apuesta utilizando el saldo del usuario activo
-    public Resultado realizarApuesta(int monto, TipoApuesta tipo) {
+    /**
+     * Ejecuta una apuesta del usuario activo.
+     *
+     * Recibe ApuestaBase para aprovechar
+     * el polimorfismo de las subclases.
+     */
+    public Resultado realizarApuesta(ApuestaBase apuesta) {
 
-        // Obtiene el usuario que inició sesión
+        // Obtiene el usuario que inicio sesion
         Usuario usuario = session.getUsuarioActual();
 
-        // Ejecuta la apuesta con el saldo individual
+        // Ejecuta la apuesta con su saldo actual
         Resultado resultado = ruleta.jugar(
-                monto,
-                tipo,
+                apuesta,
                 usuario.getSaldo()
         );
 
-        // Guarda la jugada y actualiza el saldo del usuario
+        // Registra el resultado y actualiza el saldo
         usuario.agregarResultado(resultado);
 
         return resultado;
     }
 
-    // Recarga el saldo del usuario activo
+    /**
+     * Permite depositar dinero en la cuenta
+     * del usuario activo.
+     */
     public void depositar(int monto) {
-
-        Usuario usuario = session.getUsuarioActual();
-
-        usuario.depositar(monto);
+        session.getUsuarioActual().depositar(monto);
     }
 
-    // Devuelve el saldo del usuario activo
+    /**
+     * Devuelve el saldo del usuario activo.
+     */
     public int getSaldo() {
-
-        Usuario usuario = session.getUsuarioActual();
-
-        return usuario.getSaldo();
+        return session.getUsuarioActual().getSaldo();
     }
 
-    // Devuelve el historial individual del usuario activo
+    /**
+     * Devuelve el historial individual
+     * del usuario que inicio sesion.
+     */
     public List<Resultado> getHistorial() {
-
-        Usuario usuario = session.getUsuarioActual();
-
-        return usuario.getHistorial();
+        return session.getUsuarioActual().getHistorial();
     }
 }
