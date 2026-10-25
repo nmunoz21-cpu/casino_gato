@@ -8,8 +8,8 @@ import java.util.List;
 /**
  * Representa un usuario del sistema.
  *
- * Administra sus datos personales, saldo,
- * historial de resultados y estadisticas.
+ * Administra los datos personales, el saldo,
+ * los resultados y las estadisticas individuales.
  */
 public class Usuario {
 
@@ -18,17 +18,17 @@ public class Usuario {
     private final String clave;
     private String nombre;
 
-    // Saldo individual del usuario
+    // Saldo individual
     private int saldo;
 
     // Historial individual de resultados
     private final List<Resultado> historial;
 
-    // Estadisticas asociadas al usuario
+    // Estadisticas calculadas desde el historial
     private final Estadisticas estadisticas;
 
     /**
-     * Constructor que inicializa los datos del usuario.
+     * Inicializa los datos del usuario.
      */
     public Usuario(String username, String clave, String nombre) {
 
@@ -37,13 +37,13 @@ public class Usuario {
 
         setNombre(nombre);
 
-        // Saldo inicial para una cuenta nueva
+        // Saldo predeterminado para una cuenta nueva
         this.saldo = 1000;
 
-        // Inicializa el historial individual
+        // Inicializa el historial
         this.historial = new ArrayList<>();
 
-        // Vincula las estadisticas al usuario
+        // Asocia las estadisticas con este usuario
         this.estadisticas = new Estadisticas(this);
     }
 
@@ -76,10 +76,14 @@ public class Usuario {
     }
 
     /**
-     * Comprueba las credenciales de acceso.
+     * Verifica las credenciales almacenadas
+     * en el objeto.
+     *
+     * La autenticacion persistente se realiza
+     * mediante RepositorioCuentas.
      */
-    public boolean validarCredenciales(String username,
-                                       String clave) {
+    public boolean validarCredenciales(
+            String username, String clave) {
 
         return this.username.equalsIgnoreCase(username)
                 && this.clave.equals(clave);
@@ -93,20 +97,19 @@ public class Usuario {
     }
 
     /**
-     * Agrega un monto positivo al saldo del usuario.
+     * Agrega un deposito al saldo.
      */
     public void depositar(int monto) {
 
         if (monto <= 0) {
             throw new IllegalArgumentException(
-                    "El monto debe ser mayor a cero"
+                    "El monto debe ser positivo"
             );
         }
 
-        // Evita que el saldo supere el maximo de int
         if (monto > Integer.MAX_VALUE - saldo) {
             throw new IllegalArgumentException(
-                    "El monto supera el saldo permitido"
+                    "El saldo supera el valor permitido"
             );
         }
 
@@ -114,13 +117,14 @@ public class Usuario {
     }
 
     /**
-     * Registra un resultado y actualiza el saldo.
+     * Registra el resultado de una ronda
+     * y actualiza el saldo del usuario.
      */
     public void agregarResultado(Resultado resultado) {
 
         if (resultado == null) {
             throw new IllegalArgumentException(
-                    "El resultado no puede ser nulo"
+                    "El resultado es obligatorio"
             );
         }
 
@@ -130,21 +134,15 @@ public class Usuario {
             );
         }
 
-        // Guarda el resultado en el historial
+        // Registra la nueva ronda
         historial.add(resultado);
 
-        // Actualiza el saldo despues de la ronda
+        // Actualiza el saldo
         saldo = resultado.getSaldo();
     }
 
     /**
-     * Restaura el saldo previamente guardado.
-     *
-     * Este metodo se utiliza al iniciar sesion,
-     * una vez que el repositorio recupera el saldo
-     * desde el archivo correspondiente.
-     *
-     * @param saldoGuardado saldo recuperado
+     * Restaura el saldo desde un archivo.
      */
     public void restaurarSaldo(int saldoGuardado) {
 
@@ -154,22 +152,63 @@ public class Usuario {
             );
         }
 
-        // Reemplaza el saldo inicial por el guardado
-        this.saldo = saldoGuardado;
+        saldo = saldoGuardado;
     }
 
     /**
-     * Devuelve las estadisticas del usuario.
+     * NUEVO METODO
+     *
+     * Restaura el historial de resultados
+     * previamente recuperado del archivo.
+     *
+     * Reemplaza el historial existente para
+     * evitar duplicaciones al iniciar sesion.
+     *
+     * No modifica el saldo, porque este se
+     * restaura por separado.
      */
-    public Estadisticas getEstadisticas() {
-        return estadisticas;
+    public void restaurarHistorial(
+            List<Resultado> historialGuardado) {
+
+        if (historialGuardado == null) {
+            throw new IllegalArgumentException(
+                    "El historial no puede ser nulo"
+            );
+        }
+
+        // Crea una copia independiente de los datos
+        List<Resultado> copia =
+                new ArrayList<>(historialGuardado);
+
+        if (copia.contains(null)) {
+            throw new IllegalArgumentException(
+                    "El historial contiene resultados nulos"
+            );
+        }
+
+        // Elimina los resultados actuales
+        historial.clear();
+
+        // Restaura los resultados recuperados
+        historial.addAll(copia);
     }
 
     /**
      * Devuelve el historial sin permitir
-     * modificaciones externas.
+     * modificaciones desde otras clases.
      */
     public List<Resultado> getHistorial() {
+
         return Collections.unmodifiableList(historial);
+    }
+
+    /**
+     * Devuelve las estadisticas del usuario.
+     *
+     * Estas se calculan automaticamente
+     * a partir del historial restaurado.
+     */
+    public Estadisticas getEstadisticas() {
+        return estadisticas;
     }
 }

@@ -1,7 +1,9 @@
 
 package Controlador;
 
+import Datos.RepositorioHistorial;
 import Datos.RepositorioUsuarios;
+
 import Modelo.ApuestaBase;
 import Modelo.Resultado;
 import Modelo.Ruleta;
@@ -12,31 +14,32 @@ import java.io.UncheckedIOException;
 import java.util.List;
 
 /**
- * Controlador encargado de coordinar las operaciones
- * de la ruleta con el usuario que inicio sesion.
+ * Controlador encargado de coordinar
+ * las operaciones de la ruleta.
  *
- * Tambien solicita al repositorio guardar el saldo
- * cuando este cambia.
+ * Solicita guardar el historial y el saldo
+ * actualizado del usuario.
  */
 public class RuletaController {
 
     // Modelo encargado de ejecutar las rondas
     private final Ruleta ruleta;
 
-    // Controlador de la sesion compartida
+    // Controlador de la sesion activa
     private final SessionController session;
 
-    // Repositorio encargado de guardar el saldo
+    // Repositorio de saldos
     private final RepositorioUsuarios repositorioUsuarios;
+
+    // Repositorio del historial de resultados
+    private final RepositorioHistorial repositorioHistorial;
 
     /**
      * Constructor del controlador.
-     *
-     * @param ruleta modelo de la ruleta
-     * @param session controlador de sesion
      */
-    public RuletaController(Ruleta ruleta,
-                            SessionController session) {
+    public RuletaController(
+            Ruleta ruleta,
+            SessionController session) {
 
         if (ruleta == null || session == null) {
             throw new IllegalArgumentException(
@@ -47,92 +50,43 @@ public class RuletaController {
         this.ruleta = ruleta;
         this.session = session;
 
-        // Inicializa el repositorio de usuarios
+        // Inicializa los repositorios
         this.repositorioUsuarios =
                 new RepositorioUsuarios();
+
+        this.repositorioHistorial =
+                new RepositorioHistorial();
     }
 
     /**
-     * Ejecuta una ronda mediante polimorfismo.
+     * Ejecuta una ronda utilizando polimorfismo.
      *
-     * Registra el resultado en el usuario
-     * y guarda el saldo actualizado.
-     *
-     * @param apuesta objeto que hereda de ApuestaBase
-     * @return resultado de la ronda
+     * Actualiza el modelo y guarda los resultados
+     * del usuario en sus archivos correspondientes.
      */
     public Resultado realizarApuesta(ApuestaBase apuesta) {
 
-        // Obtiene al usuario autenticado
+        // Obtiene el usuario de la sesion
         Usuario usuario = session.getUsuarioActual();
 
-        // Ejecuta la ronda con el saldo actual
+        // Ejecuta la ronda mediante ApuestaBase
         Resultado resultado = ruleta.jugar(
                 apuesta,
                 usuario.getSaldo()
         );
 
-        // Actualiza el historial y saldo del usuario
+        // Actualiza el historial y saldo en memoria
         usuario.agregarResultado(resultado);
-
-        // Guarda el nuevo saldo en su archivo
-        guardarSaldoUsuario(usuario);
-
-        return resultado;
-    }
-
-    /**
-     * Registra un deposito en el saldo del usuario.
-     *
-     * Despues del deposito, guarda el nuevo saldo.
-     *
-     * @param monto cantidad que se agrega al saldo
-     */
-    public void depositar(int monto) {
-
-        // Obtiene al usuario activo
-        Usuario usuario = session.getUsuarioActual();
-
-        // Actualiza el saldo en memoria
-        usuario.depositar(monto);
-
-        // Guarda el saldo actualizado
-        guardarSaldoUsuario(usuario);
-    }
-
-    /**
-     * Recupera el saldo del usuario activo.
-     *
-     * @return saldo actual
-     */
-    public int getSaldo() {
-
-        return session.getUsuarioActual().getSaldo();
-    }
-
-    /**
-     * Recupera el historial del usuario activo.
-     *
-     * @return lista de resultados
-     */
-    public List<Resultado> getHistorial() {
-
-        return session.getUsuarioActual().getHistorial();
-    }
-
-    /**
-     * Guarda el saldo del usuario en un archivo.
-     *
-     * Cada usuario tiene su propio archivo,
-     * identificado mediante su username.
-     *
-     * @param usuario usuario cuyo saldo se guardara
-     */
-    private void guardarSaldoUsuario(Usuario usuario) {
 
         try {
 
-            // Solicita al repositorio persistir el saldo
+            // Guarda el historial completo
+            repositorioHistorial.guardarHistorial(
+                    usuario.getUsername(),
+                    usuario.getHistorial()
+            );
+
+            // Guarda el saldo actualizado
             repositorioUsuarios.guardarSaldo(
                     usuario.getUsername(),
                     usuario.getSaldo()
@@ -140,12 +94,62 @@ public class RuletaController {
 
         } catch (IOException ex) {
 
-            // Informa que el saldo cambio en memoria,
-            // pero no pudo guardarse en el archivo.
+            // Informa que no se pudo completar
+            // correctamente la persistencia.
             throw new UncheckedIOException(
-                    "El saldo cambio, pero no pudo guardarse",
+                    "La ronda se registro en memoria, "
+                            + "pero no se pudieron guardar todos los datos",
                     ex
             );
         }
+
+        return resultado;
+    }
+
+    /**
+     * Deposita saldo en la cuenta del usuario.
+     *
+     * Actualiza el saldo en memoria y solicita
+     * guardarlo en el archivo correspondiente.
+     */
+    public void depositar(int monto) {
+
+        Usuario usuario = session.getUsuarioActual();
+
+        // Realiza el deposito
+        usuario.depositar(monto);
+
+        try {
+
+            // Guarda el saldo actualizado
+            repositorioUsuarios.guardarSaldo(
+                    usuario.getUsername(),
+                    usuario.getSaldo()
+            );
+
+        } catch (IOException ex) {
+
+            throw new UncheckedIOException(
+                    "El deposito cambio el saldo en memoria, "
+                            + "pero no pudo guardarse",
+                    ex
+            );
+        }
+    }
+
+    /**
+     * Devuelve el saldo del usuario activo.
+     */
+    public int getSaldo() {
+
+        return session.getUsuarioActual().getSaldo();
+    }
+
+    /**
+     * Devuelve el historial del usuario activo.
+     */
+    public List<Resultado> getHistorial() {
+
+        return session.getUsuarioActual().getHistorial();
     }
 }
