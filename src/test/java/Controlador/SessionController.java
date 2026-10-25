@@ -1,154 +1,192 @@
 
 package Controlador;
 
+import Datos.RepositorioCuentas;
 import Datos.RepositorioUsuarios;
 import Modelo.Usuario;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
- * Controlador encargado de administrar
- * el registro, inicio y cierre de sesion.
+ * Controlador encargado de administrar el registro,
+ * inicio y cierre de sesion de los usuarios.
  *
- * Tambien recupera el saldo persistente
- * del usuario al iniciar sesion.
+ * Utiliza repositorios para conservar las cuentas
+ * y los saldos entre ejecuciones del programa.
  */
 public class SessionController {
 
-    // Lista de usuarios registrados en memoria
-    private final List<Usuario> usuarios =
-            new ArrayList<>();
+    // Repositorio encargado de registrar y autenticar cuentas
+    private final RepositorioCuentas repositorioCuentas;
 
-    // Usuario que tiene la sesion activa
+    // Repositorio encargado de guardar y recuperar saldos
+    private final RepositorioUsuarios repositorioUsuarios;
+
+    // Conserva los usuarios cargados durante la ejecucion
+    private final Map<String, Usuario> usuariosEnMemoria;
+
+    // Usuario que actualmente tiene una sesion activa
     private Usuario usuarioActual;
 
-    // Repositorio que permite recuperar saldos
-    private final RepositorioUsuarios repositorioUsuarios =
-            new RepositorioUsuarios();
-
     /**
-     * Constructor de la sesion.
+     * Constructor del controlador de sesiones.
      *
-     * Inicializa los usuarios de prueba.
+     * Inicializa los repositorios y la memoria
+     * temporal de los usuarios.
      */
     public SessionController() {
 
-        usuarios.add(
-                new Usuario("Nure", "1234", "Nureddin")
-        );
+        this.repositorioCuentas = new RepositorioCuentas();
 
-        usuarios.add(
-                new Usuario("admin", "1234", "Administrador")
-        );
+        this.repositorioUsuarios = new RepositorioUsuarios();
+
+        this.usuariosEnMemoria = new HashMap<>();
+
+        this.usuarioActual = null;
     }
 
     /**
-     * Registra un usuario nuevo en el sistema.
+     * Registra una nueva cuenta de usuario.
      *
-     * Valida que sus datos no esten vacios y
-     * que el identificador no este repetido.
+     * Delega al repositorio la validacion
+     * y el almacenamiento de las credenciales.
+     *
+     * @param username identificador del usuario
+     * @param clave contrasena del usuario
+     * @param nombre nombre del usuario
      */
     public void registrarUsuario(String username,
                                  String clave,
                                  String nombre) {
 
-        // Valida los datos ingresados
-        if (username == null || username.isBlank()
-                || clave == null || clave.isBlank()
-                || nombre == null || nombre.isBlank()) {
+        try {
 
-            throw new IllegalArgumentException(
-                    "Datos requeridos"
+            // Solicita guardar la nueva cuenta
+            repositorioCuentas.registrarCuenta(
+                    username,
+                    clave,
+                    nombre
+            );
+
+        } catch (IOException ex) {
+
+            // Informa problemas de almacenamiento
+            throw new IllegalStateException(
+                    "No se pudo guardar la cuenta del usuario",
+                    ex
             );
         }
-
-        // Comprueba que el usuario no exista
-        for (Usuario usuario : usuarios) {
-
-            if (usuario.getUsername()
-                    .equalsIgnoreCase(username)) {
-
-                throw new IllegalArgumentException(
-                        "El usuario ya existe"
-                );
-            }
-        }
-
-        // Crea un nuevo usuario
-        usuarios.add(
-                new Usuario(username, clave, nombre)
-        );
     }
 
     /**
-     * Inicia sesion verificando las credenciales.
+     * Inicia sesion utilizando las credenciales
+     * almacenadas en el repositorio.
      *
-     * Si son correctas, solicita al repositorio
-     * recuperar el saldo previamente guardado.
+     * Si la autenticacion es correcta, recupera
+     * el saldo correspondiente al usuario.
      *
-     * @return true si las credenciales son validas
+     * @param username identificador del usuario
+     * @param clave contrasena ingresada
+     * @return true si el inicio de sesion es correcto
      */
     public boolean iniciarSesion(String username,
                                  String clave) {
 
-        // Recorre los usuarios registrados
-        for (Usuario usuario : usuarios) {
+        // Limpia cualquier sesion anterior
+        usuarioActual = null;
 
-            if (usuario.validarCredenciales(
-                    username, clave)) {
+        try {
 
-                try {
-
-                    // Recupera el saldo desde el archivo.
-                    // Si no existe, usa el saldo inicial.
-                    int saldoRecuperado =
-                            repositorioUsuarios.cargarSaldo(
-                                    usuario.getUsername(),
-                                    usuario.getSaldo()
-                            );
-
-                    // Actualiza el saldo en el modelo
-                    usuario.restaurarSaldo(
-                            saldoRecuperado
+            // Solicita verificar las credenciales
+            RepositorioCuentas.CuentaGuardada cuenta =
+                    repositorioCuentas.autenticar(
+                            username,
+                            clave
                     );
 
-                } catch (IOException ex) {
-
-                    // Evita abrir la sesion con informacion
-                    // persistente que no pudo recuperarse.
-                    throw new IllegalStateException(
-                            "No se pudo recuperar el saldo guardado",
-                            ex
-                    );
-                }
-
-                // Activa la sesion una vez recuperado
-                // correctamente el saldo
-                usuarioActual = usuario;
-
-                return true;
+            // Si las credenciales son incorrectas
+            if (cuenta == null) {
+                return false;
             }
-        }
 
-        // Credenciales incorrectas
-        return false;
+            // Recupera los datos de la cuenta autenticada
+            String usernameGuardado = cuenta.getUsername();
+            String nombreGuardado = cuenta.getNombre();
+
+            // Identificador para la memoria temporal
+            String identificador =
+                    usernameGuardado.toLowerCase(Locale.ROOT);
+
+            // Comprueba si el usuario ya fue cargado
+            Usuario usuario =
+                    usuariosEnMemoria.get(identificador);
+
+            // Si no existe en memoria, crea el modelo
+            if (usuario == null) {
+
+                // La contrasena se verifica en el repositorio.
+                // No necesitamos copiarla al modelo Usuario.
+                usuario = new Usuario(
+                        usernameGuardado,
+                        "",
+                        nombreGuardado
+                );
+            }
+
+            // Recupera el saldo desde el archivo
+            int saldoRecuperado =
+                    repositorioUsuarios.cargarSaldo(
+                            usernameGuardado,
+                            usuario.getSaldo()
+                    );
+
+            // Restaura el saldo del usuario
+            usuario.restaurarSaldo(saldoRecuperado);
+
+            // Conserva el usuario durante esta ejecucion
+            usuariosEnMemoria.put(
+                    identificador,
+                    usuario
+            );
+
+            // Activa la sesion autenticada
+            usuarioActual = usuario;
+
+            return true;
+
+        } catch (IOException ex) {
+
+            // Evita iniciar sesion cuando existen
+            // problemas al recuperar los datos
+            throw new IllegalStateException(
+                    "No se pudieron recuperar los datos del usuario",
+                    ex
+            );
+        }
     }
 
     /**
-     * Indica si existe una sesion activa.
+     * Comprueba si existe una sesion activa.
+     *
+     * @return true si un usuario inicio sesion
      */
     public boolean hayUsuario() {
+
         return usuarioActual != null;
     }
 
     /**
      * Devuelve el usuario de la sesion activa.
+     *
+     * @return usuario autenticado
      */
     public Usuario getUsuarioActual() {
 
         if (!hayUsuario()) {
+
             throw new IllegalStateException(
                     "No hay una sesion activa"
             );
@@ -159,6 +197,8 @@ public class SessionController {
 
     /**
      * Devuelve el nombre del usuario activo.
+     *
+     * @return nombre o cadena vacia
      */
     public String getNombreUsuario() {
 
@@ -168,7 +208,9 @@ public class SessionController {
     }
 
     /**
-     * Devuelve el identificador del usuario activo.
+     * Devuelve el username del usuario activo.
+     *
+     * @return identificador del usuario
      */
     public String getUsername() {
 
@@ -178,17 +220,20 @@ public class SessionController {
     }
 
     /**
-     * Cambia el nombre del usuario activo.
+     * Modifica el nombre del usuario activo.
+     *
+     * Por ahora el cambio se conserva en memoria.
      */
     public void cambiarNombre(String nuevoNombre) {
 
-        getUsuarioActual().setNombre(
-                nuevoNombre
-        );
+        getUsuarioActual().setNombre(nuevoNombre);
     }
 
     /**
-     * Cierra la sesion actual.
+     * Cierra la sesion del usuario actual.
+     *
+     * Los objetos de usuarios permanecen en memoria
+     * hasta que termine la ejecucion del programa.
      */
     public void cerrarSesion() {
 
