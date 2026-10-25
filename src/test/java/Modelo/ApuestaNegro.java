@@ -1,7 +1,7 @@
 package Modelo;
 
 /**
- * Representa una apuesta al color rojo.
+ * Representa una apuesta al color negro.
  *
  * Hereda los atributos y métodos comunes de ApuestaBase
  * e implementa su propia lógica de acierto.
@@ -18,11 +18,11 @@ public class ApuestaNegro extends ApuestaBase {
     }
 
     /**
-     * Comprueba si el resultado corresponde al color rojo.
+     * Comprueba si el resultado corresponde al color negro.
      *
      * @param numero número generado por la ruleta
      * @param color color del número obtenido
-     * @return true si el número es rojo y distinto de cero
+     * @return true si el número es negro y distinto de cero
      */
     @Override
     public boolean acierta(int numero, String color) {
