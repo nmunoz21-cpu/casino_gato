@@ -5,6 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Representa un usuario del sistema.
+ *
+ * Administra sus datos personales, saldo,
+ * historial de resultados y estadisticas.
+ */
 public class Usuario {
 
     // Datos de la cuenta
@@ -15,61 +21,89 @@ public class Usuario {
     // Saldo individual del usuario
     private int saldo;
 
-    // Historial individual de apuestas
+    // Historial individual de resultados
     private final List<Resultado> historial;
+
+    // Estadisticas asociadas al usuario
     private final Estadisticas estadisticas;
 
-    // Inicializa el usuario con saldo e historial propios
+    /**
+     * Constructor que inicializa los datos del usuario.
+     */
     public Usuario(String username, String clave, String nombre) {
+
         this.username = username;
         this.clave = clave;
+
         setNombre(nombre);
 
+        // Saldo inicial para una cuenta nueva
         this.saldo = 1000;
+
+        // Inicializa el historial individual
         this.historial = new ArrayList<>();
+
+        // Vincula las estadisticas al usuario
         this.estadisticas = new Estadisticas(this);
     }
 
-    // Devuelve el nombre de usuario
+    /**
+     * Devuelve el identificador del usuario.
+     */
     public String getUsername() {
         return username;
     }
 
-    // Devuelve el nombre del usuario
+    /**
+     * Devuelve el nombre del usuario.
+     */
     public String getNombre() {
         return nombre;
     }
 
-    // Modifica el nombre validando que no esté vacío
+    /**
+     * Modifica el nombre del usuario.
+     */
     public void setNombre(String nuevoNombre) {
+
         if (nuevoNombre == null || nuevoNombre.isBlank()) {
             throw new IllegalArgumentException(
-                    "El nombre no puede estar vacío"
+                    "El nombre no puede estar vacio"
             );
         }
 
         this.nombre = nuevoNombre.trim();
     }
 
-    // Valida las credenciales del usuario
-    public boolean validarCredenciales(String username, String clave) {
+    /**
+     * Comprueba las credenciales de acceso.
+     */
+    public boolean validarCredenciales(String username,
+                                       String clave) {
+
         return this.username.equalsIgnoreCase(username)
                 && this.clave.equals(clave);
     }
 
-    // Devuelve el saldo individual
+    /**
+     * Devuelve el saldo actual.
+     */
     public int getSaldo() {
         return saldo;
     }
 
-    // Permite recargar el saldo del usuario
+    /**
+     * Agrega un monto positivo al saldo del usuario.
+     */
     public void depositar(int monto) {
+
         if (monto <= 0) {
             throw new IllegalArgumentException(
                     "El monto debe ser mayor a cero"
             );
         }
 
+        // Evita que el saldo supere el maximo de int
         if (monto > Integer.MAX_VALUE - saldo) {
             throw new IllegalArgumentException(
                     "El monto supera el saldo permitido"
@@ -79,8 +113,11 @@ public class Usuario {
         saldo += monto;
     }
 
-    // Guarda una apuesta y actualiza el saldo del usuario
+    /**
+     * Registra un resultado y actualiza el saldo.
+     */
     public void agregarResultado(Resultado resultado) {
+
         if (resultado == null) {
             throw new IllegalArgumentException(
                     "El resultado no puede ser nulo"
@@ -93,17 +130,46 @@ public class Usuario {
             );
         }
 
+        // Guarda el resultado en el historial
         historial.add(resultado);
+
+        // Actualiza el saldo despues de la ronda
         saldo = resultado.getSaldo();
     }
 
-    // Devuelve el historial sin permitir cambios externos
-    public List<Resultado> getHistorial() {
-        return Collections.unmodifiableList(historial);
+    /**
+     * Restaura el saldo previamente guardado.
+     *
+     * Este metodo se utiliza al iniciar sesion,
+     * una vez que el repositorio recupera el saldo
+     * desde el archivo correspondiente.
+     *
+     * @param saldoGuardado saldo recuperado
+     */
+    public void restaurarSaldo(int saldoGuardado) {
+
+        if (saldoGuardado < 0) {
+            throw new IllegalArgumentException(
+                    "El saldo guardado no puede ser negativo"
+            );
+        }
+
+        // Reemplaza el saldo inicial por el guardado
+        this.saldo = saldoGuardado;
     }
 
-    // Devuelve las estadísticas propias del usuario
+    /**
+     * Devuelve las estadisticas del usuario.
+     */
     public Estadisticas getEstadisticas() {
         return estadisticas;
+    }
+
+    /**
+     * Devuelve el historial sin permitir
+     * modificaciones externas.
+     */
+    public List<Resultado> getHistorial() {
+        return Collections.unmodifiableList(historial);
     }
 }
